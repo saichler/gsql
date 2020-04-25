@@ -9,14 +9,13 @@ If we do an analogy to Language, the infra components are the alphabet, while th
 The Graph SQL comes to ease the language/api challenge by presenting a single, simple & common API to query the model & data or a product at runtime.
 
 ## So how does it work?
-**Model Inspector
-
+**Model Inspector**
 First you got the Model Inspector, the model inspector is accepting a GO struct or a Java Object and starts to introspect the struct/object, drilling down to discover its attributes and sub objects. From this data, it is creating the GSchema.
 
-**Parser
+**Parser**
 The parser just parses the query and validates that the syntax is correct. It divides the query string to requested GColumn, GTables & Criteria. The Criteria is divided into Expression & Compares.
 
-**InstanceId
+**InstanceId**
 An InstanceId is a string representation of an instance inside the model. For example if we have the following model:
 Employee
     Addresses
