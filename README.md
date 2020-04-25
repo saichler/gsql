@@ -27,5 +27,5 @@ An InstanceId is a string representation of an instance inside the model. For ex
                    Country
 
 
-To refer to an Employee instance, will do it via “Employee[key]”.
-To refer to an Address instance, will do it vis “Employee[key].Adresses.Address[0..]  
+To refer to an Employee instance, will do it via **“Employee[key]”**.
+To refer to an Address instance, will do it via **“Employee[key].Adresses.Address[0..]"**.  
