@@ -17,6 +17,7 @@ The parser just parses the query and validates that the syntax is correct. It di
 
 ### InstanceId
 An InstanceId is a string representation of an instance inside the model. For example if we have the following model:
+
     Employee
         Addresses
             [] Address
@@ -24,6 +25,7 @@ An InstanceId is a string representation of an instance inside the model. For ex
                    Line2
                    Zip
                    Country
-                   
+
+
 To refer to an Employee instance, will do it via “Employee[key]”.
 To refer to an Address instance, will do it vis “Employee[key].Adresses.Address[0..]  
