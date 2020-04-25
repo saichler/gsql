@@ -17,7 +17,7 @@ The parser just parses the query and validates that the syntax is correct. It di
 
 ### InstanceId
 An InstanceId is a string representation of an instance inside the model. For example if we have the following model:
-    Employee
+   Employee
         Addresses
             [] Address
                   Line1
