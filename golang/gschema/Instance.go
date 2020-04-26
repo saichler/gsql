@@ -156,6 +156,9 @@ func (instance *Instance) sliceValue(sliceValue reflect.Value, createIfNil bool)
 	}
 
 	results := make([]*Instance, 0)
+	if !instance.key.IsValid() {
+		instance.key = reflect.ValueOf("0")
+	}
 
 	if instance.key.IsValid() {
 		index, err := strconv.Atoi(instance.key.String())

@@ -14,7 +14,7 @@ type GraphSchema struct {
 
 type GraphSchemaProvider interface {
 	Tables() []string
-	Schema() *GraphSchema
+	GraphSchema() *GraphSchema
 }
 
 func NewGraphSchema() *GraphSchema {
@@ -26,6 +26,10 @@ func NewGraphSchema() *GraphSchema {
 }
 
 func (graphSchema *GraphSchema) RegisterStruct(fieldName string, parent *GraphSchemaNode, structType reflect.Type) *GraphSchemaNode {
+	if strings.Contains(fieldName, "XXX_") {
+		//Skip Proto Buffer internal attributes
+		return nil
+	}
 	graphSchemaNode := newGraphSchemaNode(fieldName, parent, structType)
 	graphSchema.mutex.Lock()
 	defer graphSchema.mutex.Unlock()

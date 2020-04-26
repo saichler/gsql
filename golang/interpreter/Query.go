@@ -89,7 +89,7 @@ func (query *Query) initTables(provider gschema.GraphSchemaProvider, pq *parser.
 		found := false
 		for _, name := range provider.Tables() {
 			if strings.ToLower(name) == tableName {
-				query.tables[tableName], _ = provider.Schema().GraphSchemaNode(name)
+				query.tables[tableName], _ = provider.GraphSchema().GraphSchemaNode(name)
 				found = true
 				break
 			}
@@ -110,7 +110,7 @@ func (query *Query) initColumns(provider gschema.GraphSchemaProvider, pq *parser
 		return nil
 	} else {
 		for _, col := range pq.Columns() {
-			sf := provider.Schema().CreateAttribute(mainTable.CreateFieldID(col))
+			sf := provider.GraphSchema().CreateAttribute(mainTable.CreateFieldID(col))
 			if sf == nil {
 				return errors.New("Cannot find query field: " + col)
 			}
@@ -122,41 +122,41 @@ func (query *Query) initColumns(provider gschema.GraphSchemaProvider, pq *parser
 
 func NewQuery(provider gschema.GraphSchemaProvider, sql string) (*Query, error) {
 
-	qp, err := parser.NewQuery(sql)
+	pQuery, err := parser.NewQuery(sql)
 	if err != nil {
 		return nil, err
 	}
-	ormQuery := &Query{}
-	ormQuery.tables = make(map[string]*gschema.GraphSchemaNode)
-	ormQuery.columns = make(map[string]*gschema.Attribute)
-	ormQuery.descending = qp.Descending()
-	ormQuery.matchCase = qp.MatchCase()
-	ormQuery.page = qp.Page()
-	ormQuery.limit = qp.Limit()
-	ormQuery.sortBy = qp.SortBy()
+	iQuery := &Query{}
+	iQuery.tables = make(map[string]*gschema.GraphSchemaNode)
+	iQuery.columns = make(map[string]*gschema.Attribute)
+	iQuery.descending = pQuery.Descending()
+	iQuery.matchCase = pQuery.MatchCase()
+	iQuery.page = pQuery.Page()
+	iQuery.limit = pQuery.Limit()
+	iQuery.sortBy = pQuery.SortBy()
 
-	err = ormQuery.initTables(provider, qp)
-	if err != nil {
-		return nil, err
-	}
-
-	err = ormQuery.initColumns(provider, qp)
+	err = iQuery.initTables(provider, pQuery)
 	if err != nil {
 		return nil, err
 	}
 
-	mainTable, err := ormQuery.getMainTable()
+	err = iQuery.initColumns(provider, pQuery)
 	if err != nil {
 		return nil, err
 	}
 
-	expr, err := CreateExpression(provider.Schema(), mainTable, qp.Where())
+	mainTable, err := iQuery.getMainTable()
 	if err != nil {
 		return nil, err
 	}
-	ormQuery.where = expr
 
-	return ormQuery, nil
+	expr, err := CreateExpression(provider.GraphSchema(), mainTable, pQuery.Where())
+	if err != nil {
+		return nil, err
+	}
+	iQuery.where = expr
+
+	return iQuery, nil
 }
 
 func (query *Query) getMainTable() (*gschema.GraphSchemaNode, error) {
@@ -227,7 +227,7 @@ func (query *Query) CreateColumns(provider gschema.GraphSchemaProvider) map[stri
 		for i := 0; i < tbl.Type().NumField(); i++ {
 			fld := tbl.Type().Field(i)
 			if fld.Type.Kind() != reflect.Slice && fld.Type.Kind() != reflect.Map && fld.Type.Kind() != reflect.Ptr {
-				sf := provider.Schema().CreateAttribute(tbl.CreateFieldID(fld.Name))
+				sf := provider.GraphSchema().CreateAttribute(tbl.CreateFieldID(fld.Name))
 				if sf != nil {
 					result[fld.Name] = sf
 				}
