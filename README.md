@@ -9,8 +9,9 @@ If we do an analogy to Language, the infra components are the alphabet, while th
 The Graph SQL comes to ease the language/api challenge by presenting a single, simple & common API to query the model & data or a product at runtime.
 
 ## So how does it work?
-### Model Inspector**
-First you got the Model Inspector, the model inspector is accepting a GO struct or a Java Object and starts to introspect the struct/object, drilling down to discover its attributes and sub objects. From this data, it is creating the GSchema.
+### Introspector
+First you got the Model Introspector, the model inspector is accepting a GO struct or a Java Object and starts to introspect the struct/object, drilling down to discover its attributes and sub objects. From this data, it is creating the Internal Schema, mapping a struct->table and attribute->column and creating the Graph Schema of the struct, mapping the relations between the root struct and its sub structs. The model introspector allows you to define annotations for an attribute so later on, when you would like to implement persistency, seeks and sorts, you can do so.
+Note: The actual db functionality & persistency layers have been extracted to another project so you could use the gsql over your model without model just for sorting and filtering you model element lists.
 
 ### Parser
 The parser just parses the query and validates that the syntax is correct. It divides the query string to requested GColumn, GTables & Criteria. The Criteria is divided into Expression & Compares.
