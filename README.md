@@ -11,13 +11,14 @@ The Graph SQL comes to ease the language/api challenge by presenting a single, s
 ## So how does it work?
 ### Introspector
 First you got the Model Introspector, the model inspector is accepting a GO struct or a Java Object and starts to introspect the struct/object, drilling down to discover its attributes and sub objects. From this data, it is creating the Internal Schema, mapping a struct->table and attribute->column and creating the Graph Schema of the struct, mapping the relations between the root struct and its sub structs. The model introspector allows you to define annotations for an attribute so later on, when you would like to implement persistency, seeks and sorts, you can do so.
-Note: The actual db functionality & persistency layers have been extracted to another project so you could use the gsql over your model without model just for sorting and filtering you model element lists.
+
+**Note: The actual db functionality & persistency layers have been extracted to another project so you could use the gsql over your model without model just for sorting and filtering you model element lists.**
 
 ### Parser
-The parser just parses the query and validates that the syntax is correct. It divides the query string to requested GColumn, GTables & Criteria. The Criteria is divided into Expression & Compares.
+The parser just parses the query and validates that the syntax is correct. It divides the query string to requested Column, Tables & Criteria. The Criteria is divided into Expression, Compares & Conditions.
 
-### InstanceId
-An InstanceId is a string representation of an instance inside the model. For example if we have the following model:
+### Instance
+An Instance is a string representation of an instance inside the model. For example if we have the following model:
 
     Employee
         Addresses
@@ -31,3 +32,25 @@ An InstanceId is a string representation of an instance inside the model. For ex
 To refer to an Employee instance, will do it via **“Employee[key]”**.
 
 To refer to an Address instance, will do it via **“Employee[key].Adresses.Address[0..]"**.  
+
+### Attribute
+An Attribute is a string representations of a struct attribute in the model, for example:
+
+To refer to Line2 in an Instance of Address, will do it via **"Employee[key].Adresses.Address[0..].Line2"**
+
+The Attribute also contains a seemless setter & getter from your model so you don't need worry about the instance chain/tree extracting data or setting data in your model. For example the following code will set the Line2 value even if Addresses is nil & Address list is nil:
+
+    employee := &Employee{}
+    attribute,_ := CreateAttribute("Employee.Adresses.Address[1].Line2")
+    attribute.SetValue("My Address Line 2")
+    
+### Interpreter
+The Inerpreter is taking a syntax valid parsed query and validating it via the Introspector schema, trying to match the string representation of the attributes to the discovered Columns & tables by the Introspector. If successful, the outcome is an Interperter Query instance that you can use to filter elements in your model using the Match method, e.g. the use it like the following code:
+
+    query,_:=NewQuery("select * from mymodel where name='xxx' or family='yyy'")
+    for _,modelElement:=range myModelElementsList {
+        if query.Match(modelElement) {
+            //This model element match the query criteria.
+        }
+    }
+    
