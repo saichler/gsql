@@ -102,7 +102,7 @@ func (query *Query) initTables(provider gschema.GraphSchemaProvider, pq *parser.
 }
 
 func (query *Query) initColumns(provider gschema.GraphSchemaProvider, pq *parser.Query) error {
-	mainTable, e := query.getMainTable()
+	mainTable, e := query.MainTable()
 	if e != nil {
 		return e
 	}
@@ -145,7 +145,7 @@ func NewQuery(provider gschema.GraphSchemaProvider, sql string) (*Query, error) 
 		return nil, err
 	}
 
-	mainTable, err := iQuery.getMainTable()
+	mainTable, err := iQuery.MainTable()
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ func NewQuery(provider gschema.GraphSchemaProvider, sql string) (*Query, error) 
 	return iQuery, nil
 }
 
-func (query *Query) getMainTable() (*gschema.GraphSchemaNode, error) {
+func (query *Query) MainTable() (*gschema.GraphSchemaNode, error) {
 	for _, t := range query.tables {
 		return t, nil
 	}

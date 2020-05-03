@@ -6,10 +6,6 @@ import (
 	"strings"
 )
 
-const (
-	InstanceId = "_IID_"
-)
-
 //InstanceID identifies a sub instance in the model via a string
 type InstanceID struct {
 	name   string
