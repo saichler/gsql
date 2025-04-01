@@ -123,23 +123,23 @@ func TestQuery12(t *testing.T) {
 		Log.Fail(t, e)
 		return
 	}
-	if !q.MatchCase() {
+	if !q.Query().MatchCase {
 		Log.Fail(t, "Expected match-case to match")
 		return
 	}
-	if !q.Descending() {
+	if !q.Query().Descending {
 		Log.Fail(t, "Expected Descending to be true")
 		return
 	}
-	if q.SortBy() != "col1" {
+	if q.Query().SortBy != "col1" {
 		Log.Fail(t, "Expected sort-by to be col1")
 		return
 	}
-	if q.Page() != 7 {
+	if q.Query().Page != 7 {
 		Log.Fail(t, "Expected page to be 7")
 		return
 	}
-	if q.Limit() != 50 {
+	if q.Query().Limit != 50 {
 		Log.Fail(t, "Expected kimit to be 50")
 		return
 	}
@@ -155,8 +155,7 @@ func TestVisualize(t *testing.T) {
 		Log.Fail(t, e)
 		return
 	}
-	fmt.Println(q.Where().String())
-	fmt.Println(q.Where().Visualize(0))
+	fmt.Println(VisualizeExpression(q.Query().Criteria, 0))
 }
 
 func TestQuery(t *testing.T) {
@@ -170,21 +169,21 @@ func TestQuery(t *testing.T) {
 	testExpression(q, "(1=2) or (((3!=4 and 5<6)) and (7>8)) or (((9=10)) and (11=12))", t)
 }
 
-func testTables(q *Query, expected string, t *testing.T) {
-	if q.RootTable() == "" {
+func testTables(q *PQuery, expected string, t *testing.T) {
+	if q.Query().RootType == "" {
 		Log.Fail(t, "Expected ", expected)
 		return
 	}
 }
 
-func testColumns(q *Query, expected []string, t *testing.T) {
-	if len(q.Columns()) != len(expected) {
-		Log.Fail(t, "Expected "+strconv.Itoa(len(expected)), " columns but got ", strconv.Itoa(len(q.Columns())))
+func testColumns(q *PQuery, expected []string, t *testing.T) {
+	if len(q.Query().Properties) != len(expected) {
+		Log.Fail(t, "Expected "+strconv.Itoa(len(expected)), " columns but got ", strconv.Itoa(len(q.Query().Properties)))
 		return
 	}
 	for _, et := range expected {
 		found := false
-		for _, qc := range q.Columns() {
+		for _, qc := range q.Query().Properties {
 			if qc == et {
 				found = true
 				break
@@ -197,9 +196,9 @@ func testColumns(q *Query, expected []string, t *testing.T) {
 	}
 }
 
-func testExpression(q *Query, expected string, t *testing.T) {
-	if q.Where().String() != expected {
+func testExpression(q *PQuery, expected string, t *testing.T) {
+	if StringExpression(q.Query().Criteria) != expected {
 		Log.Fail(t, "Expected: ", expected)
-		Log.Fail(t, "But got : ", q.Where().String())
+		Log.Fail(t, "But got : ", StringExpression(q.Query().Criteria))
 	}
 }

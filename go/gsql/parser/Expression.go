@@ -3,67 +3,45 @@ package parser
 import (
 	"bytes"
 	"errors"
+	"github.com/saichler/types/go/types"
 	"strings"
 )
 
-type Expression struct {
-	condition *Condition
-	op        ConditionOperation
-	next      *Expression
-	child     *Expression
-}
-
-func (expression *Expression) Condition() *Condition {
-	return expression.condition
-}
-
-func (expression *Expression) Operation() ConditionOperation {
-	return expression.op
-}
-
-func (expression *Expression) Next() *Expression {
-	return expression.next
-}
-
-func (expression *Expression) Child() *Expression {
-	return expression.child
-}
-
-func (expression *Expression) String() string {
+func StringExpression(this *types.Expression) string {
 	buff := bytes.Buffer{}
-	if expression.condition != nil {
-		buff.WriteString(expression.condition.String())
+	if this.Condition != nil {
+		buff.WriteString(StringCondition(this.Condition))
 	} else {
 		buff.WriteString("(")
 	}
-	if expression.child != nil {
-		buff.WriteString(expression.child.String())
+	if this.Child != nil {
+		buff.WriteString(StringExpression(this.Child))
 	}
-	if expression.condition == nil {
+	if this.Condition == nil {
 		buff.WriteString(")")
 	}
-	if expression.next != nil {
-		buff.WriteString(string(expression.op))
-		buff.WriteString(expression.next.String())
+	if this.Next != nil {
+		buff.WriteString(this.AndOr)
+		buff.WriteString(StringExpression(this.Next))
 	}
 	return buff.String()
 }
 
-func (expression *Expression) Visualize(lvl int) string {
+func VisualizeExpression(this *types.Expression, lvl int) string {
 	buff := bytes.Buffer{}
 	buff.WriteString(space(lvl))
 	buff.WriteString("Expression\n")
-	if expression.condition != nil {
-		buff.WriteString(expression.condition.Visualize(lvl + 1))
+	if this.Condition != nil {
+		buff.WriteString(VisualizeCondition(this.Condition, lvl+1))
 	}
-	if expression.child != nil {
-		buff.WriteString(expression.child.Visualize(lvl + 1))
+	if this.Child != nil {
+		buff.WriteString(VisualizeExpression(this.Child, lvl+1))
 	}
-	if expression.next != nil {
+	if this.Next != nil {
 		buff.WriteString(space(lvl))
-		buff.WriteString(strings.TrimSpace(string(expression.op)))
+		buff.WriteString(strings.TrimSpace(this.AndOr))
 		buff.WriteString("\n")
-		buff.WriteString(expression.next.Visualize(lvl))
+		buff.WriteString(VisualizeExpression(this.Next, lvl))
 	}
 	return buff.String()
 }
@@ -77,7 +55,7 @@ func space(lvl int) string {
 	return buff.String()
 }
 
-func parseExpression(ws string) (*Expression, error) {
+func parseExpression(ws string) (*types.Expression, error) {
 	initComparators()
 	ws = strings.TrimSpace(ws)
 	bo := getBO(ws)
@@ -92,35 +70,35 @@ func parseExpression(ws string) (*Expression, error) {
 	return parseWithBrackets(ws, bo)
 }
 
-func parseWithBrackets(ws string, bo int) (*Expression, error) {
+func parseWithBrackets(ws string, bo int) (*types.Expression, error) {
 	be, e := getBE(ws, bo)
 	if e != nil {
 		return nil, e
 	}
-	expr := &Expression{}
+	expr := &types.Expression{}
 	child, e := parseExpression(ws[1:be])
 	if e != nil {
 		return nil, e
 	}
 
-	expr.child = child
+	expr.Child = child
 
 	if be < len(ws)-1 {
 		op, loc, e := getFirstConditionOp(ws[be+1:])
 		if e != nil {
 			return nil, e
 		}
-		expr.op = op
+		expr.AndOr = string(op)
 		next, e := parseExpression(ws[be+1+loc+len(op):])
 		if e != nil {
 			return nil, e
 		}
-		expr.next = next
+		expr.Next = next
 	}
 	return expr, nil
 }
 
-func parseBeforeBrackets(ws string, bo int) (*Expression, error) {
+func parseBeforeBrackets(ws string, bo int) (*types.Expression, error) {
 	prefix := ws[0:bo]
 	op, loc, e := getLastConditionOp(prefix)
 	if e != nil {
@@ -130,22 +108,22 @@ func parseBeforeBrackets(ws string, bo int) (*Expression, error) {
 	if e != nil {
 		return nil, e
 	}
-	expr.op = op
+	expr.AndOr = string(op)
 	next, e := parseExpression(ws[bo:])
 	if e != nil {
 		return nil, e
 	}
-	expr.next = next
+	expr.Next = next
 	return expr, nil
 }
 
-func parseNoBrackets(ws string) (*Expression, error) {
-	expr := &Expression{}
+func parseNoBrackets(ws string) (*types.Expression, error) {
+	expr := &types.Expression{}
 	condition, e := NewCondition(ws)
 	if e != nil {
 		return nil, e
 	}
-	expr.condition = condition
+	expr.Condition = condition
 	return expr, nil
 }
 

@@ -3,6 +3,7 @@ package parser
 import (
 	"bytes"
 	"errors"
+	"github.com/saichler/types/go/types"
 	"strings"
 )
 
@@ -21,24 +22,6 @@ const (
 
 var comparators = make([]ComparatorOperation, 0)
 
-type Comparator struct {
-	left  string
-	op    ComparatorOperation
-	right string
-}
-
-func (comparator *Comparator) Left() string {
-	return comparator.left
-}
-
-func (comparator *Comparator) Right() string {
-	return comparator.right
-}
-
-func (comparator *Comparator) Operation() ComparatorOperation {
-	return comparator.op
-}
-
 func initComparators() {
 	if len(comparators) == 0 {
 		comparators = append(comparators, GTEQ)
@@ -52,38 +35,38 @@ func initComparators() {
 	}
 }
 
-func (comparator *Comparator) String() string {
+func StringComparator(this *types.Comparator) string {
 	buff := bytes.Buffer{}
-	buff.WriteString(comparator.left)
-	buff.WriteString(string(comparator.op))
-	buff.WriteString(comparator.right)
+	buff.WriteString(this.Left)
+	buff.WriteString(this.Oper)
+	buff.WriteString(this.Right)
 	return buff.String()
 }
 
-func (comparator *Comparator) Visualize(lvl int) string {
+func VisualizeComparator(this *types.Comparator, lvl int) string {
 	buff := bytes.Buffer{}
 	buff.WriteString(space(lvl))
 	buff.WriteString("Comparator (")
-	buff.WriteString(comparator.left)
-	buff.WriteString(string(comparator.op))
-	buff.WriteString(comparator.right)
+	buff.WriteString(this.Left)
+	buff.WriteString(string(this.Oper))
+	buff.WriteString(this.Right)
 	buff.WriteString(")\n")
 	return buff.String()
 }
 
-func NewCompare(ws string) (*Comparator, error) {
+func NewCompare(ws string) (*types.Comparator, error) {
 	for _, op := range comparators {
 		loc := strings.Index(ws, string(op))
 		if loc != -1 {
-			cmp := &Comparator{}
-			cmp.left = strings.TrimSpace(strings.ToLower(ws[0:loc]))
-			cmp.right = strings.TrimSpace(strings.ToLower(ws[loc+len(op):]))
-			cmp.op = op
-			if validateValue(cmp.left) != "" {
-				return nil, errors.New(validateValue(cmp.left))
+			cmp := &types.Comparator{}
+			cmp.Left = strings.TrimSpace(strings.ToLower(ws[0:loc]))
+			cmp.Right = strings.TrimSpace(strings.ToLower(ws[loc+len(op):]))
+			cmp.Oper = string(op)
+			if validateValue(cmp.Left) != "" {
+				return nil, errors.New(validateValue(cmp.Left))
 			}
-			if validateValue(cmp.right) != "" {
-				return nil, errors.New(validateValue(cmp.right))
+			if validateValue(cmp.Right) != "" {
+				return nil, errors.New(validateValue(cmp.Right))
 			}
 			return cmp, nil
 		}

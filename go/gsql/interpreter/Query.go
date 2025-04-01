@@ -17,32 +17,30 @@ type Query struct {
 	where      *Expression
 	sortBy     string
 	descending bool
-	limit      int
-	page       int
+	limit      int32
+	page       int32
 	matchCase  bool
 	resources  common.IResources
+	query      *types.Query
 }
 
-func NewQuery(gsql string, resources common.IResources) (*Query, error) {
-	pQuery, err := parser.NewQuery(gsql, resources.Logger())
-	if err != nil {
-		return nil, err
-	}
+func NewFromQuery(query *types.Query, resources common.IResources) (*Query, error) {
 	iQuery := &Query{}
 	iQuery.columns = make(map[string]*properties.Property)
-	iQuery.descending = pQuery.Descending()
-	iQuery.matchCase = pQuery.MatchCase()
-	iQuery.page = pQuery.Page()
-	iQuery.limit = pQuery.Limit()
-	iQuery.sortBy = pQuery.SortBy()
+	iQuery.descending = query.Descending
+	iQuery.matchCase = query.MatchCase
+	iQuery.page = query.Page
+	iQuery.limit = query.Limit
+	iQuery.sortBy = query.SortBy
 	iQuery.resources = resources
+	iQuery.query = query
 
-	err = iQuery.initTables(pQuery)
+	err := iQuery.initTables(query)
 	if err != nil {
 		return nil, err
 	}
 
-	err = iQuery.initColumns(pQuery, resources.Introspector())
+	err = iQuery.initColumns(query, resources.Introspector())
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +50,7 @@ func NewQuery(gsql string, resources common.IResources) (*Query, error) {
 		return nil, errors.New("root table is nil")
 	}
 
-	expr, err := CreateExpression(pQuery.Where(), rootTable, resources.Introspector())
+	expr, err := CreateExpression(query.Criteria, rootTable, resources.Introspector())
 	if err != nil {
 		return nil, err
 	}
@@ -61,12 +59,24 @@ func NewQuery(gsql string, resources common.IResources) (*Query, error) {
 	return iQuery, nil
 }
 
-func (query *Query) String() string {
+func NewQuery(gsql string, resources common.IResources) (*Query, error) {
+	pQuery, err := parser.NewQuery(gsql, resources.Logger())
+	if err != nil {
+		return nil, err
+	}
+	return NewFromQuery(pQuery.Query(), resources)
+}
+
+func (this *Query) Query() *types.Query {
+	return this.query
+}
+
+func (this *Query) String() string {
 	buff := bytes.Buffer{}
 	buff.WriteString("Select ")
 	first := true
 
-	for _, column := range query.columns {
+	for _, column := range this.columns {
 		if !first {
 			buff.WriteString(", ")
 		}
@@ -76,67 +86,67 @@ func (query *Query) String() string {
 	}
 
 	buff.WriteString(" From ")
-	buff.WriteString(query.rootTable.TypeName)
+	buff.WriteString(this.rootTable.TypeName)
 
-	if query.where != nil {
+	if this.where != nil {
 		buff.WriteString(" Where ")
-		buff.WriteString(query.where.String())
+		buff.WriteString(this.where.String())
 	}
 	return buff.String()
 }
 
-func (query *Query) RootTable() *types.RNode {
-	return query.rootTable
+func (this *Query) RootTable() *types.RNode {
+	return this.rootTable
 }
 
-func (query *Query) Columns() map[string]*properties.Property {
-	return query.columns
+func (this *Query) Columns() map[string]*properties.Property {
+	return this.columns
 }
 
-func (query *Query) OnlyTopLevel() bool {
+func (this *Query) OnlyTopLevel() bool {
 	return true
 }
 
-func (query *Query) Descending() bool {
-	return query.descending
+func (this *Query) Descending() bool {
+	return this.descending
 }
 
-func (query *Query) MatchCase() bool {
-	return query.matchCase
+func (this *Query) MatchCase() bool {
+	return this.matchCase
 }
 
-func (query *Query) Page() int {
-	return query.page
+func (this *Query) Page() int32 {
+	return this.page
 }
 
-func (query *Query) Limit() int {
-	return query.limit
+func (this *Query) Limit() int32 {
+	return this.limit
 }
 
-func (query *Query) SortBy() string {
-	return query.sortBy
+func (this *Query) SortBy() string {
+	return this.sortBy
 }
 
-func (query *Query) initTables(pq *parser.Query) error {
-	node, ok := query.resources.Introspector().Node(pq.RootTable())
+func (this *Query) initTables(query *types.Query) error {
+	node, ok := this.resources.Introspector().Node(query.RootType)
 	if !ok {
-		return query.resources.Logger().Error("Cannot find node for table ", pq.RootTable())
+		return this.resources.Logger().Error("Cannot find node for table ", query.RootType)
 	}
-	query.rootTable = node
+	this.rootTable = node
 	return nil
 }
 
-func (query *Query) initColumns(pq *parser.Query, introspector common.IIntrospector) error {
-	if pq.Columns() != nil && len(pq.Columns()) == 1 && pq.Columns()[0] == "*" {
+func (this *Query) initColumns(query *types.Query, introspector common.IIntrospector) error {
+	if query.Properties != nil && len(query.Properties) == 1 && query.Properties[0] == "*" {
 		return nil
 	} else {
-		for _, col := range pq.Columns() {
-			propPath := propertyPath(col, query.rootTable.TypeName)
+		for _, col := range query.Properties {
+			propPath := propertyPath(col, this.rootTable.TypeName)
 			prop, err := properties.PropertyOf(propPath, introspector)
 			if err != nil {
-				return query.resources.Logger().Error("cannot find property for col ", propPath, ":", err.Error())
+				return this.resources.Logger().Error("cannot find property for col ", propPath, ":", err.Error())
 			}
-			query.columns[col] = prop
+			this.columns[col] = prop
 		}
 	}
 	return nil
@@ -154,54 +164,54 @@ func propertyPath(colName, rootTable string) string {
 	return buff.String()
 }
 
-func (query *Query) match(root interface{}) (bool, error) {
+func (this *Query) match(root interface{}) (bool, error) {
 	if root == nil {
 		return false, nil
 	}
-	if query.rootTable == nil {
+	if this.rootTable == nil {
 		return false, nil
 	}
-	if query.where == nil {
+	if this.where == nil {
 		return true, nil
 	}
-	return query.where.Match(root)
+	return this.where.Match(root)
 }
 
-func (query *Query) Filter(list []interface{}, onlySelectedColumns bool) []interface{} {
+func (this *Query) Filter(list []interface{}, onlySelectedColumns bool) []interface{} {
 	result := make([]interface{}, 0)
 	for _, i := range list {
-		if query.Match(i) {
-			if !onlySelectedColumns || len(query.columns) == 0 {
+		if this.Match(i) {
+			if !onlySelectedColumns || len(this.columns) == 0 {
 				result = append(result, i)
 			} else {
-				result = append(result, query.cloneOnlyWithColumns(i))
+				result = append(result, this.cloneOnlyWithColumns(i))
 			}
 		}
 	}
 	return result
 }
 
-func (query *Query) Match(any interface{}) bool {
-	m, e := query.match(any)
+func (this *Query) Match(any interface{}) bool {
+	m, e := this.match(any)
 	if e != nil {
-		query.resources.Logger().Error(e)
+		this.resources.Logger().Error(e)
 	}
 	return m
 }
 
-func (query *Query) cloneOnlyWithColumns(any interface{}) interface{} {
+func (this *Query) cloneOnlyWithColumns(any interface{}) interface{} {
 	typ := reflect.ValueOf(any).Elem().Type()
 	clone := reflect.New(typ).Interface()
-	for _, column := range query.columns {
+	for _, column := range this.columns {
 		v, _ := column.Get(any)
 		column.Set(clone, v)
 	}
 	return clone
 }
 
-func (query *Query) CreateColumns(introspector common.IIntrospector) map[string]*properties.Property {
+func (this *Query) CreateColumns(introspector common.IIntrospector) map[string]*properties.Property {
 	result := make(map[string]*properties.Property)
-	for attrName, attr := range query.rootTable.Attributes {
+	for attrName, attr := range this.rootTable.Attributes {
 		if attr.IsStruct {
 			continue
 		}

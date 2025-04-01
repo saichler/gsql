@@ -3,22 +3,14 @@ package parser
 import (
 	"bytes"
 	"github.com/saichler/types/go/common"
+	"github.com/saichler/types/go/types"
 	"strconv"
 	"strings"
 )
 
-type Query struct {
-	query      string
-	schemaName string
-	sortBy     string
-	descending bool
-	limit      int
-	page       int
-	matchCase  bool
-	rootTable  string
-	column     []string
-	where      *Expression
-	log        common.ILogger
+type PQuery struct {
+	log    common.ILogger
+	pquery types.Query
 }
 
 type parsed struct {
@@ -47,45 +39,13 @@ const (
 
 var words = []string{Select, From, Where, SortBy, Descending, Ascending, Limit, Page, MatchCase}
 
-func (this *Query) Where() *Expression {
-	return this.where
+func (this *PQuery) Query() *types.Query {
+	return &this.pquery
 }
 
-func (this *Query) RootTable() string {
-	return this.rootTable
-}
-
-func (this *Query) Columns() []string {
-	return this.column
-}
-
-func (this *Query) SchemaName() string {
-	return this.schemaName
-}
-
-func (this *Query) SortBy() string {
-	return this.sortBy
-}
-
-func (this *Query) Descending() bool {
-	return this.descending
-}
-
-func (this *Query) Limit() int {
-	return this.limit
-}
-
-func (this *Query) Page() int {
-	return this.page
-}
-
-func (this *Query) MatchCase() bool {
-	return this.matchCase
-}
-
-func NewQuery(query string, log common.ILogger) (*Query, error) {
-	cwql := &Query{}
-	cwql.query = query
+func NewQuery(query string, log common.ILogger) (*PQuery, error) {
+	cwql := &PQuery{}
+	cwql.pquery.Text = query
 	cwql.log = log
 	e := cwql.init()
 	return cwql, e
@@ -110,8 +70,8 @@ func TrimAndLowerNoKeys(sql string) string {
 	return buff.String()
 }
 
-func (this *Query) split() *parsed {
-	sql := TrimAndLowerNoKeys(this.query)
+func (this *PQuery) split() *parsed {
+	sql := TrimAndLowerNoKeys(this.pquery.Text)
 	data := &parsed{}
 	data.select_ = getSplitTag(sql, Select)
 	data.from_ = getTag(sql, From)
@@ -164,19 +124,19 @@ func getSplitTag(str, tag string) []string {
 	return result
 }
 
-func (this *Query) init() error {
+func (this *PQuery) init() error {
 	p := this.split()
-	this.column = make([]string, 0)
-	this.rootTable = strings.TrimSpace(p.from_)
+	this.pquery.Properties = make([]string, 0)
+	this.pquery.RootType = strings.TrimSpace(p.from_)
 	for _, col := range p.select_ {
-		this.column = append(this.column, col)
+		this.pquery.Properties = append(this.pquery.Properties, col)
 	}
 	if p.where_ != "" {
 		where, e := parseExpression(p.where_)
 		if e != nil {
 			return e
 		}
-		this.where = where
+		this.pquery.Criteria = where
 	}
 	if p.limit_ != "" {
 		limit, e := strconv.Atoi(p.limit_)
@@ -187,24 +147,24 @@ func (this *Query) init() error {
 		if limit >= 1000 {
 			return this.log.Error("Invalid limit: Limit is limited up to 1000 elements")
 		}
-		this.limit = limit
+		this.pquery.Limit = int32(limit)
 	}
 	if p.page_ != "" {
 		page, e := strconv.Atoi(p.page_)
 		if e != nil {
 			return this.log.Error("Invalid page:", p.page_, ":", e.Error())
 		}
-		this.page = page
+		this.pquery.Page = int32(page)
 	}
-	this.sortBy = p.sortby_
+	this.pquery.SortBy = p.sortby_
 	if p.descending_ == "true" {
-		this.descending = true
+		this.pquery.Descending = true
 	}
 	if p.ascending_ == "true" {
-		this.descending = false
+		this.pquery.Descending = false
 	}
 	if p.matchcase_ != "" {
-		this.matchCase = true
+		this.pquery.MatchCase = true
 	}
 	return nil
 }

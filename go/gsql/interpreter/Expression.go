@@ -35,30 +35,30 @@ func (expression *Expression) String() string {
 	return buff.String()
 }
 
-func CreateExpression(expr *parser.Expression, rootTable *types.RNode, introspector common.IIntrospector) (*Expression, error) {
+func CreateExpression(expr *types.Expression, rootTable *types.RNode, introspector common.IIntrospector) (*Expression, error) {
 	if expr == nil {
 		return nil, nil
 	}
 	ormExpr := &Expression{}
-	ormExpr.op = expr.Operation()
-	if expr.Condition() != nil {
-		cond, e := CreateCondition(expr.Condition(), rootTable, introspector)
+	ormExpr.op = parser.ConditionOperation(expr.AndOr)
+	if expr.Condition != nil {
+		cond, e := CreateCondition(expr.Condition, rootTable, introspector)
 		if e != nil {
 			return nil, e
 		}
 		ormExpr.condition = cond
 	}
 
-	if expr.Child() != nil {
-		child, e := CreateExpression(expr.Child(), rootTable, introspector)
+	if expr.Child != nil {
+		child, e := CreateExpression(expr.Child, rootTable, introspector)
 		if e != nil {
 			return nil, e
 		}
 		ormExpr.child = child
 	}
 
-	if expr.Next() != nil {
-		next, e := CreateExpression(expr.Next(), rootTable, introspector)
+	if expr.Next != nil {
+		next, e := CreateExpression(expr.Next, rootTable, introspector)
 		if e != nil {
 			return nil, e
 		}

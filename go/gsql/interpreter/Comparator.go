@@ -55,12 +55,12 @@ func (comparator *Comparator) String() string {
 	return buff.String()
 }
 
-func CreateComparator(c *parser.Comparator, rootTable *types.RNode, introspector common.IIntrospector) (*Comparator, error) {
+func CreateComparator(c *types.Comparator, rootTable *types.RNode, introspector common.IIntrospector) (*Comparator, error) {
 	initComparables()
 	ormComp := &Comparator{}
-	ormComp.op = c.Operation()
-	ormComp.left = c.Left()
-	ormComp.right = c.Right()
+	ormComp.op = parser.ComparatorOperation(c.Oper)
+	ormComp.left = c.Left
+	ormComp.right = c.Right
 	leftProp := propertyPath(ormComp.left, rootTable.TypeName)
 	rightProp := propertyPath(ormComp.right, rootTable.TypeName)
 	ormComp.leftSchemaField, _ = properties.PropertyOf(leftProp, introspector)

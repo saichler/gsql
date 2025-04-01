@@ -3,6 +3,7 @@ package parser
 import (
 	"bytes"
 	"errors"
+	"github.com/saichler/types/go/types"
 	"strings"
 )
 
@@ -14,59 +15,41 @@ const (
 	MAX_EXPRESSION_SIZE                    = 999999
 )
 
-type Condition struct {
-	comparator *Comparator
-	op         ConditionOperation
-	next       *Condition
-}
-
-func (condition *Condition) Comparator() *Comparator {
-	return condition.comparator
-}
-
-func (condition *Condition) Operation() ConditionOperation {
-	return condition.op
-}
-
-func (condition *Condition) Next() *Condition {
-	return condition.next
-}
-
-func (condition *Condition) String() string {
+func StringCondition(this *types.Condition) string {
 	buff := &bytes.Buffer{}
 	buff.WriteString("(")
-	condition.toString(buff)
+	toString(this, buff)
 	buff.WriteString(")")
 	return buff.String()
 }
 
-func (condition *Condition) Visualize(lvl int) string {
+func VisualizeCondition(this *types.Condition, lvl int) string {
 	buff := &bytes.Buffer{}
 	buff.WriteString(space(lvl))
 	buff.WriteString("Condition\n")
-	if condition.comparator != nil {
-		buff.WriteString(condition.comparator.Visualize(lvl + 1))
+	if this.Comparator != nil {
+		buff.WriteString(VisualizeComparator(this.Comparator, lvl+1))
 	}
-	if condition.next != nil {
+	if this.Next != nil {
 		buff.WriteString(space(lvl))
-		buff.WriteString(strings.TrimSpace(string(condition.op)))
+		buff.WriteString(strings.TrimSpace(this.Oper))
 		buff.WriteString("\n")
-		buff.WriteString(condition.next.Visualize(lvl))
+		buff.WriteString(VisualizeCondition(this.Next, lvl))
 	}
 	return buff.String()
 }
 
-func (condition *Condition) toString(buff *bytes.Buffer) {
-	if condition.comparator != nil {
-		buff.WriteString(condition.comparator.String())
+func toString(this *types.Condition, buff *bytes.Buffer) {
+	if this.Comparator != nil {
+		buff.WriteString(StringComparator(this.Comparator))
 	}
-	if condition.next != nil {
-		buff.WriteString(string(condition.op))
-		condition.next.toString(buff)
+	if this.Next != nil {
+		buff.WriteString(this.Oper)
+		toString(this.Next, buff)
 	}
 }
 
-func NewCondition(ws string) (*Condition, error) {
+func NewCondition(ws string) (*types.Condition, error) {
 	loc := MAX_EXPRESSION_SIZE
 	var op ConditionOperation
 	and := strings.Index(ws, string(And))
@@ -80,13 +63,13 @@ func NewCondition(ws string) (*Condition, error) {
 		op = Or
 	}
 
-	condition := &Condition{}
+	condition := &types.Condition{}
 	if loc == MAX_EXPRESSION_SIZE {
 		cmpr, e := NewCompare(ws)
 		if e != nil {
 			return nil, e
 		}
-		condition.comparator = cmpr
+		condition.Comparator = cmpr
 		return condition, nil
 	}
 
@@ -95,8 +78,8 @@ func NewCondition(ws string) (*Condition, error) {
 		return nil, e
 	}
 
-	condition.comparator = cmpr
-	condition.op = op
+	condition.Comparator = cmpr
+	condition.Oper = string(op)
 
 	ws = ws[loc+len(op):]
 	next, e := NewCondition(ws)
@@ -104,7 +87,7 @@ func NewCondition(ws string) (*Condition, error) {
 		return nil, e
 	}
 
-	condition.next = next
+	condition.Next = next
 	return condition, nil
 }
 

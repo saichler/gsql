@@ -3,16 +3,16 @@ module github.com/saichler/gsql/go
 go 1.24.1
 
 require (
-	github.com/saichler/l8test/go v0.0.0-20250331141617-04c64718b5cb
-	github.com/saichler/reflect/go v0.0.0-20250331164246-d7b9b678fa7d
-	github.com/saichler/types/go v0.0.0-20250327162701-de3b6c266ee5
+	github.com/saichler/l8test v0.0.0-20250401165218-69dfda194910
+	github.com/saichler/reflect v0.0.0-20250401163548-f9f4693fb455
+	github.com/saichler/types/go v0.0.0-20250401182456-448e75878bfb
 )
 
 require (
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/saichler/layer8/go v0.0.0-20250327183324-ab554613aa33 // indirect
-	github.com/saichler/serializer/go v0.0.0-20250327183844-6ed7a8a5b3ae // indirect
-	github.com/saichler/servicepoints/go v0.0.0-20250327183714-c026a96f20d6 // indirect
-	github.com/saichler/shared/go v0.0.0-20250327144546-dc40bb3ea146 // indirect
+	github.com/saichler/layer8 v0.0.0-20250401164211-9fe6c1570137 // indirect
+	github.com/saichler/serializer v0.0.0-20250401165135-60edd88ff8b5 // indirect
+	github.com/saichler/servicepoints v0.0.0-20250401164304-bc61e6e03ff5 // indirect
+	github.com/saichler/shared v0.0.0-20250401164021-48ac2d54144e // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 )
