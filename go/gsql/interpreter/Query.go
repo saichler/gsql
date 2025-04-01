@@ -12,8 +12,8 @@ import (
 )
 
 type Query struct {
-	rootTable  *types.RNode
-	columns    map[string]*properties.Property
+	rootType   *types.RNode
+	properties map[string]common.IProperty
 	where      *Expression
 	sortBy     string
 	descending bool
@@ -26,7 +26,7 @@ type Query struct {
 
 func NewFromQuery(query *types.Query, resources common.IResources) (*Query, error) {
 	iQuery := &Query{}
-	iQuery.columns = make(map[string]*properties.Property)
+	iQuery.properties = make(map[string]common.IProperty)
 	iQuery.descending = query.Descending
 	iQuery.matchCase = query.MatchCase
 	iQuery.page = query.Page
@@ -45,7 +45,7 @@ func NewFromQuery(query *types.Query, resources common.IResources) (*Query, erro
 		return nil, err
 	}
 
-	rootTable := iQuery.RootTable()
+	rootTable := iQuery.RootType()
 	if rootTable == nil {
 		return nil, errors.New("root table is nil")
 	}
@@ -76,7 +76,7 @@ func (this *Query) String() string {
 	buff.WriteString("Select ")
 	first := true
 
-	for _, column := range this.columns {
+	for _, column := range this.Properties() {
 		if !first {
 			buff.WriteString(", ")
 		}
@@ -95,11 +95,11 @@ func (this *Query) String() string {
 	return buff.String()
 }
 
-func (this *Query) RootTable() *types.RNode {
+func (this *Query) RootType() *types.RNode {
 	return this.rootTable
 }
 
-func (this *Query) Columns() map[string]*properties.Property {
+func (this *Query) Properties() map[string]common.IProperty {
 	return this.columns
 }
 
