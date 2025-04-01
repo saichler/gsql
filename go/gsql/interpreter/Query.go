@@ -86,7 +86,7 @@ func (this *Query) String() string {
 	}
 
 	buff.WriteString(" From ")
-	buff.WriteString(this.rootTable.TypeName)
+	buff.WriteString(this.rootType.TypeName)
 
 	if this.where != nil {
 		buff.WriteString(" Where ")
@@ -96,11 +96,11 @@ func (this *Query) String() string {
 }
 
 func (this *Query) RootType() *types.RNode {
-	return this.rootTable
+	return this.rootType
 }
 
 func (this *Query) Properties() map[string]common.IProperty {
-	return this.columns
+	return this.properties
 }
 
 func (this *Query) OnlyTopLevel() bool {
@@ -132,7 +132,7 @@ func (this *Query) initTables(query *types.Query) error {
 	if !ok {
 		return this.resources.Logger().Error("Cannot find node for table ", query.RootType)
 	}
-	this.rootTable = node
+	this.rootType = node
 	return nil
 }
 
@@ -141,12 +141,12 @@ func (this *Query) initColumns(query *types.Query, introspector common.IIntrospe
 		return nil
 	} else {
 		for _, col := range query.Properties {
-			propPath := propertyPath(col, this.rootTable.TypeName)
+			propPath := propertyPath(col, this.rootType.TypeName)
 			prop, err := properties.PropertyOf(propPath, introspector)
 			if err != nil {
 				return this.resources.Logger().Error("cannot find property for col ", propPath, ":", err.Error())
 			}
-			this.columns[col] = prop
+			this.properties[col] = prop
 		}
 	}
 	return nil
@@ -168,7 +168,7 @@ func (this *Query) match(root interface{}) (bool, error) {
 	if root == nil {
 		return false, nil
 	}
-	if this.rootTable == nil {
+	if this.rootType == nil {
 		return false, nil
 	}
 	if this.where == nil {
@@ -181,7 +181,7 @@ func (this *Query) Filter(list []interface{}, onlySelectedColumns bool) []interf
 	result := make([]interface{}, 0)
 	for _, i := range list {
 		if this.Match(i) {
-			if !onlySelectedColumns || len(this.columns) == 0 {
+			if !onlySelectedColumns || len(this.properties) == 0 {
 				result = append(result, i)
 			} else {
 				result = append(result, this.cloneOnlyWithColumns(i))
@@ -202,7 +202,7 @@ func (this *Query) Match(any interface{}) bool {
 func (this *Query) cloneOnlyWithColumns(any interface{}) interface{} {
 	typ := reflect.ValueOf(any).Elem().Type()
 	clone := reflect.New(typ).Interface()
-	for _, column := range this.columns {
+	for _, column := range this.properties {
 		v, _ := column.Get(any)
 		column.Set(clone, v)
 	}
@@ -211,7 +211,7 @@ func (this *Query) cloneOnlyWithColumns(any interface{}) interface{} {
 
 func (this *Query) CreateColumns(introspector common.IIntrospector) map[string]*properties.Property {
 	result := make(map[string]*properties.Property)
-	for attrName, attr := range this.rootTable.Attributes {
+	for attrName, attr := range this.rootType.Attributes {
 		if attr.IsStruct {
 			continue
 		}
