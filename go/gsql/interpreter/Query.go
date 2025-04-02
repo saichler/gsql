@@ -216,14 +216,6 @@ func (this *Query) cloneOnlyWithColumns(any interface{}) interface{} {
 	return clone
 }
 
-func (this *Query) CreateColumns(introspector common.IIntrospector) map[string]*properties.Property {
-	result := make(map[string]*properties.Property)
-	for attrName, attr := range this.rootType.Attributes {
-		if attr.IsStruct {
-			continue
-		}
-		//@TODO - create a method to calc propertyid for node
-		result[attrName], _ = properties.PropertyOf(attrName, introspector)
-	}
-	return result
+func (this *Query) Criteria() common.IExpression {
+	return this.where
 }

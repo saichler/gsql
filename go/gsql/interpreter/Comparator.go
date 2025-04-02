@@ -96,3 +96,15 @@ func (comparator *Comparator) Match(root interface{}) (bool, error) {
 	}
 	return matcher.Compare(leftValue, rightValue), nil
 }
+
+func (comparator *Comparator) Left() string {
+	return comparator.left
+}
+
+func (comparator *Comparator) Right() string {
+	return comparator.right
+}
+
+func (comparator *Comparator) Operator() string {
+	return string(comparator.op)
+}

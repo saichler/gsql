@@ -76,3 +76,15 @@ func (condition *Condition) Match(root interface{}) (bool, error) {
 	}
 	return false, errors.New("Unsupported operation in match:" + string(condition.op))
 }
+
+func (condition *Condition) Comparator() common.IComparator {
+	return condition.comparator
+}
+
+func (condition *Condition) Operator() string {
+	return string(condition.op)
+}
+
+func (condition *Condition) Next() common.ICondition {
+	return condition.next
+}

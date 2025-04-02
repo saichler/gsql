@@ -108,3 +108,19 @@ func (expression *Expression) Match(root interface{}) (bool, error) {
 
 	return false, errors.New("Unsupported operation in match:" + string(expression.op))
 }
+
+func (expression *Expression) Condition() common.ICondition {
+	return expression.condition
+}
+
+func (expression *Expression) Operator() string {
+	return string(expression.op)
+}
+
+func (expression *Expression) Next() common.IExpression {
+	return expression.next
+}
+
+func (expression *Expression) Child() common.IExpression {
+	return expression.child
+}
