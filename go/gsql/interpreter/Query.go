@@ -12,21 +12,23 @@ import (
 )
 
 type Query struct {
-	rootType   *types.RNode
-	properties map[string]common.IProperty
-	where      *Expression
-	sortBy     string
-	descending bool
-	limit      int32
-	page       int32
-	matchCase  bool
-	resources  common.IResources
-	query      *types.Query
+	rootType      *types.RNode
+	propertiesMap map[string]common.IProperty
+	properties    []common.IProperty
+	where         *Expression
+	sortBy        string
+	descending    bool
+	limit         int32
+	page          int32
+	matchCase     bool
+	resources     common.IResources
+	query         *types.Query
 }
 
 func NewFromQuery(query *types.Query, resources common.IResources) (*Query, error) {
 	iQuery := &Query{}
-	iQuery.properties = make(map[string]common.IProperty)
+	iQuery.propertiesMap = make(map[string]common.IProperty)
+	iQuery.properties = make([]common.IProperty, 0)
 	iQuery.descending = query.Descending
 	iQuery.matchCase = query.MatchCase
 	iQuery.page = query.Page
@@ -99,7 +101,11 @@ func (this *Query) RootType() *types.RNode {
 	return this.rootType
 }
 
-func (this *Query) Properties() map[string]common.IProperty {
+func (this *Query) PropertiesMap() map[string]common.IProperty {
+	return this.propertiesMap
+}
+
+func (this *Query) Properties() []common.IProperty {
 	return this.properties
 }
 
@@ -146,7 +152,8 @@ func (this *Query) initColumns(query *types.Query, introspector common.IIntrospe
 			if err != nil {
 				return this.resources.Logger().Error("cannot find property for col ", propPath, ":", err.Error())
 			}
-			this.properties[col] = prop
+			this.propertiesMap[col] = prop
+			this.properties = append(this.properties, prop)
 		}
 	}
 	return nil
