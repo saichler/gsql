@@ -10,27 +10,27 @@ import (
 
 type Expression struct {
 	condition *Condition
-	op        parser.ConditionOperation
+	operation parser.ConditionOperation
 	next      *Expression
 	child     *Expression
 }
 
-func (expression *Expression) String() string {
+func (this *Expression) String() string {
 	buff := bytes.Buffer{}
-	if expression.condition != nil {
-		buff.WriteString(expression.condition.String())
+	if this.condition != nil {
+		buff.WriteString(this.condition.String())
 	} else {
 		buff.WriteString("(")
 	}
-	if expression.child != nil {
-		buff.WriteString(expression.child.String())
+	if this.child != nil {
+		buff.WriteString(this.child.String())
 	}
-	if expression.condition == nil {
+	if this.condition == nil {
 		buff.WriteString(")")
 	}
-	if expression.next != nil {
-		buff.WriteString(string(expression.op))
-		buff.WriteString(expression.next.String())
+	if this.next != nil {
+		buff.WriteString(string(this.operation))
+		buff.WriteString(this.next.String())
 	}
 	return buff.String()
 }
@@ -40,7 +40,7 @@ func CreateExpression(expr *types.Expression, rootTable *types.RNode, introspect
 		return nil, nil
 	}
 	ormExpr := &Expression{}
-	ormExpr.op = parser.ConditionOperation(expr.AndOr)
+	ormExpr.operation = parser.ConditionOperation(expr.AndOr)
 	if expr.Condition != nil {
 		cond, e := CreateCondition(expr.Condition, rootTable, introspector)
 		if e != nil {
@@ -68,59 +68,59 @@ func CreateExpression(expr *types.Expression, rootTable *types.RNode, introspect
 	return ormExpr, nil
 }
 
-func (expression *Expression) Match(root interface{}) (bool, error) {
+func (this *Expression) Match(root interface{}) (bool, error) {
 	cond := true
 	child := true
 	next := true
 	var e error
-	if expression.op == parser.Or {
+	if this.operation == parser.Or {
 		cond = false
 		child = false
 		next = false
 	}
-	if expression.condition != nil {
-		cond, e = expression.condition.Match(root)
+	if this.condition != nil {
+		cond, e = this.condition.Match(root)
 		if e != nil {
 			return false, e
 		}
 	}
-	if expression.child != nil {
-		child, e = expression.child.Match(root)
+	if this.child != nil {
+		child, e = this.child.Match(root)
 		if e != nil {
 			return false, e
 		}
 	}
-	if expression.next != nil {
-		next, e = expression.next.Match(root)
+	if this.next != nil {
+		next, e = this.next.Match(root)
 		if e != nil {
 			return false, e
 		}
 	}
-	if expression.op == "" {
+	if this.operation == "" {
 		return child && next && cond, nil
 	}
-	if expression.op == parser.And {
+	if this.operation == parser.And {
 		return child && next && cond, nil
 	}
-	if expression.op == parser.Or {
+	if this.operation == parser.Or {
 		return child || next || cond, nil
 	}
 
-	return false, errors.New("Unsupported operation in match:" + string(expression.op))
+	return false, errors.New("Unsupported operation in match:" + string(this.operation))
 }
 
-func (expression *Expression) Condition() common.ICondition {
-	return expression.condition
+func (this *Expression) Condition() common.ICondition {
+	return this.condition
 }
 
-func (expression *Expression) Operator() string {
-	return string(expression.op)
+func (this *Expression) Operator() string {
+	return string(this.operation)
 }
 
-func (expression *Expression) Next() common.IExpression {
-	return expression.next
+func (this *Expression) Next() common.IExpression {
+	return this.next
 }
 
-func (expression *Expression) Child() common.IExpression {
-	return expression.child
+func (this *Expression) Child() common.IExpression {
+	return this.child
 }

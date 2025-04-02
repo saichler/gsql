@@ -11,11 +11,11 @@ import (
 )
 
 type Comparator struct {
-	left             string
-	leftSchemaField  *properties.Property
-	op               parser.ComparatorOperation
-	right            string
-	rightSchemaField *properties.Property
+	left          string
+	leftProperty  *properties.Property
+	operation     parser.ComparatorOperation
+	right         string
+	rightProperty *properties.Property
 }
 
 type Comparable interface {
@@ -37,20 +37,20 @@ func initComparables() {
 	}
 }
 
-func (comparator *Comparator) String() string {
+func (this *Comparator) String() string {
 	buff := bytes.Buffer{}
-	if comparator.leftSchemaField != nil {
-		pid, _ := comparator.leftSchemaField.PropertyId()
+	if this.leftProperty != nil {
+		pid, _ := this.leftProperty.PropertyId()
 		buff.WriteString(pid)
 	} else {
-		buff.WriteString(comparator.left)
+		buff.WriteString(this.left)
 	}
-	buff.WriteString(string(comparator.op))
-	if comparator.rightSchemaField != nil {
-		pid, _ := comparator.rightSchemaField.PropertyId()
+	buff.WriteString(string(this.operation))
+	if this.rightProperty != nil {
+		pid, _ := this.rightProperty.PropertyId()
 		buff.WriteString(pid)
 	} else {
-		buff.WriteString(comparator.right)
+		buff.WriteString(this.right)
 	}
 	return buff.String()
 }
@@ -58,53 +58,61 @@ func (comparator *Comparator) String() string {
 func CreateComparator(c *types.Comparator, rootTable *types.RNode, introspector common.IIntrospector) (*Comparator, error) {
 	initComparables()
 	ormComp := &Comparator{}
-	ormComp.op = parser.ComparatorOperation(c.Oper)
+	ormComp.operation = parser.ComparatorOperation(c.Oper)
 	ormComp.left = c.Left
 	ormComp.right = c.Right
 	leftProp := propertyPath(ormComp.left, rootTable.TypeName)
 	rightProp := propertyPath(ormComp.right, rootTable.TypeName)
-	ormComp.leftSchemaField, _ = properties.PropertyOf(leftProp, introspector)
-	ormComp.rightSchemaField, _ = properties.PropertyOf(rightProp, introspector)
+	ormComp.leftProperty, _ = properties.PropertyOf(leftProp, introspector)
+	ormComp.rightProperty, _ = properties.PropertyOf(rightProp, introspector)
 
-	if ormComp.leftSchemaField == nil && ormComp.rightSchemaField == nil {
+	if ormComp.leftProperty == nil && ormComp.rightProperty == nil {
 		return nil, errors.New("No Field was found for comparator: " + c.String())
 	}
 	return ormComp, nil
 }
 
-func (comparator *Comparator) Match(root interface{}) (bool, error) {
+func (this *Comparator) Match(root interface{}) (bool, error) {
 	var leftValue interface{}
 	var rightValue interface{}
 	var err error
-	if comparator.leftSchemaField != nil {
-		leftValue, err = comparator.leftSchemaField.Get(root)
+	if this.leftProperty != nil {
+		leftValue, err = this.leftProperty.Get(root)
 		if err != nil {
 			return false, err
 		}
 	} else {
-		leftValue = comparator.left
+		leftValue = this.left
 	}
-	if comparator.rightSchemaField != nil {
-		rightValue, err = comparator.rightSchemaField.Get(root)
+	if this.rightProperty != nil {
+		rightValue, err = this.rightProperty.Get(root)
 		return false, err
 	} else {
-		rightValue = comparator.right
+		rightValue = this.right
 	}
-	matcher := comparables[comparator.op]
+	matcher := comparables[this.operation]
 	if matcher == nil {
-		panic("No Matcher for: " + comparator.op + " operation.")
+		panic("No Matcher for: " + this.operation + " operation.")
 	}
 	return matcher.Compare(leftValue, rightValue), nil
 }
 
-func (comparator *Comparator) Left() string {
-	return comparator.left
+func (this *Comparator) Left() string {
+	return this.left
 }
 
-func (comparator *Comparator) Right() string {
-	return comparator.right
+func (this *Comparator) LeftProperty() common.IProperty {
+	return this.leftProperty
 }
 
-func (comparator *Comparator) Operator() string {
-	return string(comparator.op)
+func (this *Comparator) Right() string {
+	return this.right
+}
+
+func (this *Comparator) RightProperty() common.IProperty {
+	return this.rightProperty
+}
+
+func (this *Comparator) Operator() string {
+	return string(this.operation)
 }

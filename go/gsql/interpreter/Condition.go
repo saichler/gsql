@@ -10,13 +10,13 @@ import (
 
 type Condition struct {
 	comparator *Comparator
-	op         parser.ConditionOperation
+	operation  parser.ConditionOperation
 	next       *Condition
 }
 
 func CreateCondition(c *types.Condition, rootTable *types.RNode, introspector common.IIntrospector) (*Condition, error) {
 	condition := &Condition{}
-	condition.op = parser.ConditionOperation(c.Oper)
+	condition.operation = parser.ConditionOperation(c.Oper)
 	comp, e := CreateComparator(c.Comparator, rootTable, introspector)
 	if e != nil {
 		return nil, e
@@ -32,59 +32,59 @@ func CreateCondition(c *types.Condition, rootTable *types.RNode, introspector co
 	return condition, nil
 }
 
-func (condition *Condition) String() string {
+func (this *Condition) String() string {
 	buff := &bytes.Buffer{}
 	buff.WriteString("(")
-	condition.toString(buff)
+	this.toString(buff)
 	buff.WriteString(")")
 	return buff.String()
 }
 
-func (condition *Condition) toString(buff *bytes.Buffer) {
-	if condition.comparator != nil {
-		buff.WriteString(condition.comparator.String())
+func (this *Condition) toString(buff *bytes.Buffer) {
+	if this.comparator != nil {
+		buff.WriteString(this.comparator.String())
 	}
-	if condition.next != nil {
-		buff.WriteString(string(condition.op))
-		condition.next.toString(buff)
+	if this.next != nil {
+		buff.WriteString(string(this.operation))
+		this.next.toString(buff)
 	}
 }
 
-func (condition *Condition) Match(root interface{}) (bool, error) {
-	comp, e := condition.comparator.Match(root)
+func (this *Condition) Match(root interface{}) (bool, error) {
+	comp, e := this.comparator.Match(root)
 	if e != nil {
 		return false, e
 	}
 	next := true
-	if condition.op == parser.Or {
+	if this.operation == parser.Or {
 		next = false
 	}
-	if condition.next != nil {
-		next, e = condition.next.Match(root)
+	if this.next != nil {
+		next, e = this.next.Match(root)
 		if e != nil {
 			return false, e
 		}
 	}
-	if condition.op == "" {
+	if this.operation == "" {
 		return next && comp, nil
 	}
-	if condition.op == parser.And {
+	if this.operation == parser.And {
 		return comp && next, nil
 	}
-	if condition.op == parser.Or {
+	if this.operation == parser.Or {
 		return comp || next, nil
 	}
-	return false, errors.New("Unsupported operation in match:" + string(condition.op))
+	return false, errors.New("Unsupported operation in match:" + string(this.operation))
 }
 
-func (condition *Condition) Comparator() common.IComparator {
-	return condition.comparator
+func (this *Condition) Comparator() common.IComparator {
+	return this.comparator
 }
 
-func (condition *Condition) Operator() string {
-	return string(condition.op)
+func (this *Condition) Operator() string {
+	return string(this.operation)
 }
 
-func (condition *Condition) Next() common.ICondition {
-	return condition.next
+func (this *Condition) Next() common.ICondition {
+	return this.next
 }

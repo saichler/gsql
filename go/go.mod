@@ -5,7 +5,7 @@ go 1.24.1
 require (
 	github.com/saichler/l8test v0.0.0-20250401165218-69dfda194910
 	github.com/saichler/reflect v0.0.0-20250401192941-a21ec7e97c52
-	github.com/saichler/types/go v0.0.0-20250402174316-d2b6ccde5e4e
+	github.com/saichler/types/go v0.0.0-20250402180326-d9ecd98a157a
 )
 
 require (
