@@ -219,3 +219,10 @@ func (this *Query) cloneOnlyWithColumns(any interface{}) interface{} {
 func (this *Query) Criteria() common.IExpression {
 	return this.where
 }
+
+func (this *Query) KeyOf() string {
+	if this.where == nil {
+		return ""
+	}
+	return this.where.keyOf()
+}

@@ -116,3 +116,13 @@ func (this *Comparator) RightProperty() common.IProperty {
 func (this *Comparator) Operator() string {
 	return string(this.operation)
 }
+
+func (this *Comparator) keyOf() string {
+	if this.leftProperty == nil {
+		return this.left
+	}
+	if this.rightProperty == nil {
+		return this.right
+	}
+	return ""
+}

@@ -88,3 +88,13 @@ func (this *Condition) Operator() string {
 func (this *Condition) Next() common.ICondition {
 	return this.next
 }
+
+func (this *Condition) keyOf() string {
+	if this.comparator != nil {
+		return this.comparator.keyOf()
+	}
+	if this.next != nil {
+		return this.next.keyOf()
+	}
+	return ""
+}

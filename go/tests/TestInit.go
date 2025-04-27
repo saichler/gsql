@@ -9,7 +9,7 @@ import (
 )
 
 func createQuery(query string) (*interpreter.Query, common.IResources, error) {
-	r, _ := CreateResources(25000, 2)
+	r, _ := CreateResources(25000, 2, common.Trace_Level)
 	r.Introspector().Inspect(&testtypes.TestProto{})
 	q, e := interpreter.NewQuery(query, r)
 	return q, r, e

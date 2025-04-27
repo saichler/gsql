@@ -124,3 +124,16 @@ func (this *Expression) Next() common.IExpression {
 func (this *Expression) Child() common.IExpression {
 	return this.child
 }
+
+func (this *Expression) keyOf() string {
+	if this.condition != nil {
+		return this.condition.keyOf()
+	}
+	if this.child != nil {
+		return this.child.keyOf()
+	}
+	if this.next != nil {
+		return this.next.keyOf()
+	}
+	return ""
+}
