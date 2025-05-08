@@ -3,13 +3,13 @@ package tests
 import (
 	"github.com/saichler/gsql/go/gsql/interpreter"
 	. "github.com/saichler/l8test/go/infra/t_resources"
-	"github.com/saichler/types/go/common"
-	"github.com/saichler/types/go/testtypes"
+	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/testtypes"
 	"testing"
 )
 
-func createQuery(query string) (*interpreter.Query, common.IResources, error) {
-	r, _ := CreateResources(25000, 2, common.Trace_Level)
+func createQuery(query string) (*interpreter.Query, ifs.IResources, error) {
+	r, _ := CreateResources(25000, 2, ifs.Trace_Level)
 	r.Introspector().Inspect(&testtypes.TestProto{})
 	q, e := interpreter.NewQuery(query, r)
 	return q, r, e

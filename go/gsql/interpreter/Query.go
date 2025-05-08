@@ -5,30 +5,30 @@ import (
 	"errors"
 	"github.com/saichler/gsql/go/gsql/parser"
 	"github.com/saichler/reflect/go/reflect/properties"
-	"github.com/saichler/types/go/common"
-	"github.com/saichler/types/go/types"
+	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types"
 	"reflect"
 	"strings"
 )
 
 type Query struct {
 	rootType      *types.RNode
-	propertiesMap map[string]common.IProperty
-	properties    []common.IProperty
+	propertiesMap map[string]ifs.IProperty
+	properties    []ifs.IProperty
 	where         *Expression
 	sortBy        string
 	descending    bool
 	limit         int32
 	page          int32
 	matchCase     bool
-	resources     common.IResources
+	resources     ifs.IResources
 	query         *types.Query
 }
 
-func NewFromQuery(query *types.Query, resources common.IResources) (*Query, error) {
+func NewFromQuery(query *types.Query, resources ifs.IResources) (*Query, error) {
 	iQuery := &Query{}
-	iQuery.propertiesMap = make(map[string]common.IProperty)
-	iQuery.properties = make([]common.IProperty, 0)
+	iQuery.propertiesMap = make(map[string]ifs.IProperty)
+	iQuery.properties = make([]ifs.IProperty, 0)
 	iQuery.descending = query.Descending
 	iQuery.matchCase = query.MatchCase
 	iQuery.page = query.Page
@@ -61,7 +61,7 @@ func NewFromQuery(query *types.Query, resources common.IResources) (*Query, erro
 	return iQuery, nil
 }
 
-func NewQuery(gsql string, resources common.IResources) (*Query, error) {
+func NewQuery(gsql string, resources ifs.IResources) (*Query, error) {
 	pQuery, err := parser.NewQuery(gsql, resources.Logger())
 	if err != nil {
 		return nil, err
@@ -101,11 +101,11 @@ func (this *Query) RootType() *types.RNode {
 	return this.rootType
 }
 
-func (this *Query) PropertiesMap() map[string]common.IProperty {
+func (this *Query) PropertiesMap() map[string]ifs.IProperty {
 	return this.propertiesMap
 }
 
-func (this *Query) Properties() []common.IProperty {
+func (this *Query) Properties() []ifs.IProperty {
 	return this.properties
 }
 
@@ -142,7 +142,7 @@ func (this *Query) initTables(query *types.Query) error {
 	return nil
 }
 
-func (this *Query) initColumns(query *types.Query, introspector common.IIntrospector) error {
+func (this *Query) initColumns(query *types.Query, introspector ifs.IIntrospector) error {
 	if query.Properties != nil && len(query.Properties) == 1 && query.Properties[0] == "*" {
 		return nil
 	} else {
@@ -216,7 +216,7 @@ func (this *Query) cloneOnlyWithColumns(any interface{}) interface{} {
 	return clone
 }
 
-func (this *Query) Criteria() common.IExpression {
+func (this *Query) Criteria() ifs.IExpression {
 	return this.where
 }
 

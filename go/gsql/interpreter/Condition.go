@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"github.com/saichler/gsql/go/gsql/parser"
-	"github.com/saichler/types/go/common"
-	"github.com/saichler/types/go/types"
+	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types"
 )
 
 type Condition struct {
@@ -14,7 +14,7 @@ type Condition struct {
 	next       *Condition
 }
 
-func CreateCondition(c *types.Condition, rootTable *types.RNode, introspector common.IIntrospector) (*Condition, error) {
+func CreateCondition(c *types.Condition, rootTable *types.RNode, introspector ifs.IIntrospector) (*Condition, error) {
 	condition := &Condition{}
 	condition.operation = parser.ConditionOperation(c.Oper)
 	comp, e := CreateComparator(c.Comparator, rootTable, introspector)
@@ -77,7 +77,7 @@ func (this *Condition) Match(root interface{}) (bool, error) {
 	return false, errors.New("Unsupported operation in match:" + string(this.operation))
 }
 
-func (this *Condition) Comparator() common.IComparator {
+func (this *Condition) Comparator() ifs.IComparator {
 	return this.comparator
 }
 
@@ -85,7 +85,7 @@ func (this *Condition) Operator() string {
 	return string(this.operation)
 }
 
-func (this *Condition) Next() common.ICondition {
+func (this *Condition) Next() ifs.ICondition {
 	return this.next
 }
 

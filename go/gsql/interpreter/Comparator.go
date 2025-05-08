@@ -6,8 +6,8 @@ import (
 	"github.com/saichler/gsql/go/gsql/interpreter/comparators"
 	"github.com/saichler/gsql/go/gsql/parser"
 	"github.com/saichler/reflect/go/reflect/properties"
-	"github.com/saichler/types/go/common"
-	"github.com/saichler/types/go/types"
+	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types"
 )
 
 type Comparator struct {
@@ -55,7 +55,7 @@ func (this *Comparator) String() string {
 	return buff.String()
 }
 
-func CreateComparator(c *types.Comparator, rootTable *types.RNode, introspector common.IIntrospector) (*Comparator, error) {
+func CreateComparator(c *types.Comparator, rootTable *types.RNode, introspector ifs.IIntrospector) (*Comparator, error) {
 	initComparables()
 	ormComp := &Comparator{}
 	ormComp.operation = parser.ComparatorOperation(c.Oper)
@@ -101,7 +101,7 @@ func (this *Comparator) Left() string {
 	return this.left
 }
 
-func (this *Comparator) LeftProperty() common.IProperty {
+func (this *Comparator) LeftProperty() ifs.IProperty {
 	return this.leftProperty
 }
 
@@ -109,7 +109,7 @@ func (this *Comparator) Right() string {
 	return this.right
 }
 
-func (this *Comparator) RightProperty() common.IProperty {
+func (this *Comparator) RightProperty() ifs.IProperty {
 	return this.rightProperty
 }
 

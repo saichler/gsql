@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"github.com/saichler/gsql/go/gsql/parser"
-	"github.com/saichler/types/go/common"
-	"github.com/saichler/types/go/types"
+	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types"
 )
 
 type Expression struct {
@@ -35,7 +35,7 @@ func (this *Expression) String() string {
 	return buff.String()
 }
 
-func CreateExpression(expr *types.Expression, rootTable *types.RNode, introspector common.IIntrospector) (*Expression, error) {
+func CreateExpression(expr *types.Expression, rootTable *types.RNode, introspector ifs.IIntrospector) (*Expression, error) {
 	if expr == nil {
 		return nil, nil
 	}
@@ -109,7 +109,7 @@ func (this *Expression) Match(root interface{}) (bool, error) {
 	return false, errors.New("Unsupported operation in match:" + string(this.operation))
 }
 
-func (this *Expression) Condition() common.ICondition {
+func (this *Expression) Condition() ifs.ICondition {
 	return this.condition
 }
 
@@ -117,11 +117,11 @@ func (this *Expression) Operator() string {
 	return string(this.operation)
 }
 
-func (this *Expression) Next() common.IExpression {
+func (this *Expression) Next() ifs.IExpression {
 	return this.next
 }
 
-func (this *Expression) Child() common.IExpression {
+func (this *Expression) Child() ifs.IExpression {
 	return this.child
 }
 

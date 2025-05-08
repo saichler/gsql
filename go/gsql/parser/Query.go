@@ -2,14 +2,14 @@ package parser
 
 import (
 	"bytes"
-	"github.com/saichler/types/go/common"
-	"github.com/saichler/types/go/types"
+	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types"
 	"strconv"
 	"strings"
 )
 
 type PQuery struct {
-	log    common.ILogger
+	log    ifs.ILogger
 	pquery types.Query
 }
 
@@ -43,7 +43,7 @@ func (this *PQuery) Query() *types.Query {
 	return &this.pquery
 }
 
-func NewQuery(query string, log common.ILogger) (*PQuery, error) {
+func NewQuery(query string, log ifs.ILogger) (*PQuery, error) {
 	cwql := &PQuery{}
 	cwql.pquery.Text = query
 	cwql.log = log
