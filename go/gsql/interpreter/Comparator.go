@@ -5,9 +5,9 @@ import (
 	"errors"
 	"github.com/saichler/gsql/go/gsql/interpreter/comparators"
 	"github.com/saichler/gsql/go/gsql/parser"
-	"github.com/saichler/reflect/go/reflect/properties"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types"
+	"github.com/saichler/reflect/go/reflect/properties"
 )
 
 type Comparator struct {
@@ -55,7 +55,7 @@ func (this *Comparator) String() string {
 	return buff.String()
 }
 
-func CreateComparator(c *types.Comparator, rootTable *types.RNode, introspector ifs.IIntrospector) (*Comparator, error) {
+func CreateComparator(c *types.Comparator, rootTable *types.RNode, resources ifs.IResources) (*Comparator, error) {
 	initComparables()
 	ormComp := &Comparator{}
 	ormComp.operation = parser.ComparatorOperation(c.Oper)
@@ -63,8 +63,8 @@ func CreateComparator(c *types.Comparator, rootTable *types.RNode, introspector 
 	ormComp.right = c.Right
 	leftProp := propertyPath(ormComp.left, rootTable.TypeName)
 	rightProp := propertyPath(ormComp.right, rootTable.TypeName)
-	ormComp.leftProperty, _ = properties.PropertyOf(leftProp, introspector)
-	ormComp.rightProperty, _ = properties.PropertyOf(rightProp, introspector)
+	ormComp.leftProperty, _ = properties.PropertyOf(leftProp, resources)
+	ormComp.rightProperty, _ = properties.PropertyOf(rightProp, resources)
 
 	if ormComp.leftProperty == nil && ormComp.rightProperty == nil {
 		return nil, errors.New("No Field was found for comparator: " + c.String())

@@ -14,16 +14,16 @@ type Condition struct {
 	next       *Condition
 }
 
-func CreateCondition(c *types.Condition, rootTable *types.RNode, introspector ifs.IIntrospector) (*Condition, error) {
+func CreateCondition(c *types.Condition, rootTable *types.RNode, resources ifs.IResources) (*Condition, error) {
 	condition := &Condition{}
 	condition.operation = parser.ConditionOperation(c.Oper)
-	comp, e := CreateComparator(c.Comparator, rootTable, introspector)
+	comp, e := CreateComparator(c.Comparator, rootTable, resources)
 	if e != nil {
 		return nil, e
 	}
 	condition.comparator = comp
 	if c.Next != nil {
-		next, e := CreateCondition(c.Next, rootTable, introspector)
+		next, e := CreateCondition(c.Next, rootTable, resources)
 		if e != nil {
 			return nil, e
 		}

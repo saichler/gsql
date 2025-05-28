@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"github.com/saichler/gsql/go/gsql/parser"
-	"github.com/saichler/reflect/go/reflect/properties"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types"
+	"github.com/saichler/reflect/go/reflect/properties"
 	"reflect"
 	"strings"
 )
@@ -42,7 +42,7 @@ func NewFromQuery(query *types.Query, resources ifs.IResources) (*Query, error) 
 		return nil, err
 	}
 
-	err = iQuery.initColumns(query, resources.Introspector())
+	err = iQuery.initColumns(query, resources)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func NewFromQuery(query *types.Query, resources ifs.IResources) (*Query, error) 
 		return nil, errors.New("root table is nil")
 	}
 
-	expr, err := CreateExpression(query.Criteria, rootTable, resources.Introspector())
+	expr, err := CreateExpression(query.Criteria, rootTable, resources)
 	if err != nil {
 		return nil, err
 	}
@@ -142,13 +142,13 @@ func (this *Query) initTables(query *types.Query) error {
 	return nil
 }
 
-func (this *Query) initColumns(query *types.Query, introspector ifs.IIntrospector) error {
+func (this *Query) initColumns(query *types.Query, resources ifs.IResources) error {
 	if query.Properties != nil && len(query.Properties) == 1 && query.Properties[0] == "*" {
 		return nil
 	} else {
 		for _, col := range query.Properties {
 			propPath := propertyPath(col, this.rootType.TypeName)
-			prop, err := properties.PropertyOf(propPath, introspector)
+			prop, err := properties.PropertyOf(propPath, resources)
 			if err != nil {
 				return this.resources.Logger().Error("cannot find property for col ", propPath, ":", err.Error())
 			}

@@ -35,14 +35,14 @@ func (this *Expression) String() string {
 	return buff.String()
 }
 
-func CreateExpression(expr *types.Expression, rootTable *types.RNode, introspector ifs.IIntrospector) (*Expression, error) {
+func CreateExpression(expr *types.Expression, rootTable *types.RNode, resources ifs.IResources) (*Expression, error) {
 	if expr == nil {
 		return nil, nil
 	}
 	ormExpr := &Expression{}
 	ormExpr.operation = parser.ConditionOperation(expr.AndOr)
 	if expr.Condition != nil {
-		cond, e := CreateCondition(expr.Condition, rootTable, introspector)
+		cond, e := CreateCondition(expr.Condition, rootTable, resources)
 		if e != nil {
 			return nil, e
 		}
@@ -50,7 +50,7 @@ func CreateExpression(expr *types.Expression, rootTable *types.RNode, introspect
 	}
 
 	if expr.Child != nil {
-		child, e := CreateExpression(expr.Child, rootTable, introspector)
+		child, e := CreateExpression(expr.Child, rootTable, resources)
 		if e != nil {
 			return nil, e
 		}
@@ -58,7 +58,7 @@ func CreateExpression(expr *types.Expression, rootTable *types.RNode, introspect
 	}
 
 	if expr.Next != nil {
-		next, e := CreateExpression(expr.Next, rootTable, introspector)
+		next, e := CreateExpression(expr.Next, rootTable, resources)
 		if e != nil {
 			return nil, e
 		}
