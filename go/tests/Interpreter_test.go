@@ -73,6 +73,13 @@ func TestMultiMatchValue(t *testing.T) {
 	}
 }
 
+func TestMatchStar(t *testing.T) {
+	node := CreateTestModelInstance(1)
+	if !checkMatch("select * from testproto where mystring=*", node, true, t) {
+		return
+	}
+}
+
 func TestDeepMatchMultiValueMap(t *testing.T) {
 	node := CreateTestModelInstance(1)
 	for _, v := range node.MyString2ModelMap {

@@ -66,6 +66,9 @@ func eqStringMatcher(left, right interface{}) bool {
 	if zside == "nil" && aside == "" {
 		return true
 	}
+	if aside == "*" || zside == "*" {
+		return true
+	}
 	splits := GetWildCardSubstrings(zside)
 	if splits == nil {
 		return aside == zside
