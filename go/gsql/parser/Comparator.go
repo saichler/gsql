@@ -3,7 +3,6 @@ package parser
 import (
 	"bytes"
 	"errors"
-	"github.com/saichler/l8types/go/types"
 	"strings"
 )
 

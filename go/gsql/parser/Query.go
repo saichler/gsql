@@ -3,7 +3,6 @@ package parser
 import (
 	"bytes"
 	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/l8types/go/types"
 	"strconv"
 	"strings"
 )

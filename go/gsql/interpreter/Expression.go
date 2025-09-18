@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/saichler/gsql/go/gsql/parser"
 	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/l8types/go/types"
 )
 
 type Expression struct {
