@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"strings"
+
+	"github.com/saichler/l8types/go/types/l8api"
 )
 
 type ComparatorOperation string
@@ -34,7 +36,7 @@ func initComparators() {
 	}
 }
 
-func StringComparator(this *types.Comparator) string {
+func StringComparator(this *l8api.L8Comparator) string {
 	buff := bytes.Buffer{}
 	buff.WriteString(this.Left)
 	buff.WriteString(this.Oper)
@@ -42,7 +44,7 @@ func StringComparator(this *types.Comparator) string {
 	return buff.String()
 }
 
-func VisualizeComparator(this *types.Comparator, lvl int) string {
+func VisualizeComparator(this *l8api.L8Comparator, lvl int) string {
 	buff := bytes.Buffer{}
 	buff.WriteString(space(lvl))
 	buff.WriteString("Comparator (")
@@ -53,11 +55,11 @@ func VisualizeComparator(this *types.Comparator, lvl int) string {
 	return buff.String()
 }
 
-func NewCompare(ws string) (*types.Comparator, error) {
+func NewCompare(ws string) (*l8api.L8Comparator, error) {
 	for _, op := range comparators {
 		loc := strings.Index(ws, string(op))
 		if loc != -1 {
-			cmp := &types.Comparator{}
+			cmp := &l8api.L8Comparator{}
 			cmp.Left = strings.TrimSpace(strings.ToLower(ws[0:loc]))
 			cmp.Right = strings.TrimSpace(strings.ToLower(ws[loc+len(op):]))
 			cmp.Oper = string(op)

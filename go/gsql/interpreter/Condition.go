@@ -3,8 +3,11 @@ package interpreter
 import (
 	"bytes"
 	"errors"
+
 	"github.com/saichler/gsql/go/gsql/parser"
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types/l8api"
+	"github.com/saichler/l8types/go/types/l8reflect"
 )
 
 type Condition struct {
@@ -13,7 +16,7 @@ type Condition struct {
 	next       *Condition
 }
 
-func CreateCondition(c *types.Condition, rootTable *types.RNode, resources ifs.IResources) (*Condition, error) {
+func CreateCondition(c *l8api.L8Condition, rootTable *l8reflect.L8Node, resources ifs.IResources) (*Condition, error) {
 	condition := &Condition{}
 	condition.operation = parser.ConditionOperation(c.Oper)
 	comp, e := CreateComparator(c.Comparator, rootTable, resources)

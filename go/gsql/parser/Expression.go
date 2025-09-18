@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"strings"
+
+	"github.com/saichler/l8types/go/types/l8api"
 )
 
-func StringExpression(this *types.Expression) string {
+func StringExpression(this *l8api.L8Expression) string {
 	buff := bytes.Buffer{}
 	if this.Condition != nil {
 		buff.WriteString(StringCondition(this.Condition))
@@ -26,7 +28,7 @@ func StringExpression(this *types.Expression) string {
 	return buff.String()
 }
 
-func VisualizeExpression(this *types.Expression, lvl int) string {
+func VisualizeExpression(this *l8api.L8Expression, lvl int) string {
 	buff := bytes.Buffer{}
 	buff.WriteString(space(lvl))
 	buff.WriteString("Expression\n")
@@ -54,7 +56,7 @@ func space(lvl int) string {
 	return buff.String()
 }
 
-func parseExpression(ws string) (*types.Expression, error) {
+func parseExpression(ws string) (*l8api.L8Expression, error) {
 	initComparators()
 	ws = strings.TrimSpace(ws)
 	bo := getBO(ws)
@@ -69,12 +71,12 @@ func parseExpression(ws string) (*types.Expression, error) {
 	return parseWithBrackets(ws, bo)
 }
 
-func parseWithBrackets(ws string, bo int) (*types.Expression, error) {
+func parseWithBrackets(ws string, bo int) (*l8api.L8Expression, error) {
 	be, e := getBE(ws, bo)
 	if e != nil {
 		return nil, e
 	}
-	expr := &types.Expression{}
+	expr := &l8api.L8Expression{}
 	child, e := parseExpression(ws[1:be])
 	if e != nil {
 		return nil, e
@@ -97,7 +99,7 @@ func parseWithBrackets(ws string, bo int) (*types.Expression, error) {
 	return expr, nil
 }
 
-func parseBeforeBrackets(ws string, bo int) (*types.Expression, error) {
+func parseBeforeBrackets(ws string, bo int) (*l8api.L8Expression, error) {
 	prefix := ws[0:bo]
 	op, loc, e := getLastConditionOp(prefix)
 	if e != nil {
@@ -116,8 +118,8 @@ func parseBeforeBrackets(ws string, bo int) (*types.Expression, error) {
 	return expr, nil
 }
 
-func parseNoBrackets(ws string) (*types.Expression, error) {
-	expr := &types.Expression{}
+func parseNoBrackets(ws string) (*l8api.L8Expression, error) {
+	expr := &l8api.L8Expression{}
 	condition, e := NewCondition(ws)
 	if e != nil {
 		return nil, e

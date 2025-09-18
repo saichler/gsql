@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"strings"
+
+	"github.com/saichler/l8types/go/types/l8api"
 )
 
 type ConditionOperation string
@@ -14,7 +16,7 @@ const (
 	MAX_EXPRESSION_SIZE                    = 999999
 )
 
-func StringCondition(this *types.Condition) string {
+func StringCondition(this *l8api.L8Condition) string {
 	buff := &bytes.Buffer{}
 	buff.WriteString("(")
 	toString(this, buff)
@@ -22,7 +24,7 @@ func StringCondition(this *types.Condition) string {
 	return buff.String()
 }
 
-func VisualizeCondition(this *types.Condition, lvl int) string {
+func VisualizeCondition(this *l8api.L8Condition, lvl int) string {
 	buff := &bytes.Buffer{}
 	buff.WriteString(space(lvl))
 	buff.WriteString("Condition\n")
@@ -38,7 +40,7 @@ func VisualizeCondition(this *types.Condition, lvl int) string {
 	return buff.String()
 }
 
-func toString(this *types.Condition, buff *bytes.Buffer) {
+func toString(this *l8api.L8Condition, buff *bytes.Buffer) {
 	if this.Comparator != nil {
 		buff.WriteString(StringComparator(this.Comparator))
 	}
@@ -48,7 +50,7 @@ func toString(this *types.Condition, buff *bytes.Buffer) {
 	}
 }
 
-func NewCondition(ws string) (*types.Condition, error) {
+func NewCondition(ws string) (*l8api.L8Condition, error) {
 	loc := MAX_EXPRESSION_SIZE
 	var op ConditionOperation
 	and := strings.Index(ws, string(And))
@@ -62,7 +64,7 @@ func NewCondition(ws string) (*types.Condition, error) {
 		op = Or
 	}
 
-	condition := &types.Condition{}
+	condition := &l8api.L8Condition{}
 	if loc == MAX_EXPRESSION_SIZE {
 		cmpr, e := NewCompare(ws)
 		if e != nil {

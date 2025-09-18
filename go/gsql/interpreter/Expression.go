@@ -3,8 +3,11 @@ package interpreter
 import (
 	"bytes"
 	"errors"
+
 	"github.com/saichler/gsql/go/gsql/parser"
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types/l8api"
+	"github.com/saichler/l8types/go/types/l8reflect"
 )
 
 type Expression struct {
@@ -34,7 +37,7 @@ func (this *Expression) String() string {
 	return buff.String()
 }
 
-func CreateExpression(expr *types.Expression, rootTable *types.RNode, resources ifs.IResources) (*Expression, error) {
+func CreateExpression(expr *l8api.L8Expression, rootTable *l8reflect.L8Node, resources ifs.IResources) (*Expression, error) {
 	if expr == nil {
 		return nil, nil
 	}

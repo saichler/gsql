@@ -2,14 +2,17 @@ package parser
 
 import (
 	"bytes"
+
 	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types/l8api"
+
 	"strconv"
 	"strings"
 )
 
 type PQuery struct {
 	log    ifs.ILogger
-	pquery types.Query
+	pquery l8api.L8Query
 }
 
 type parsed struct {
@@ -38,7 +41,7 @@ const (
 
 var words = []string{Select, From, Where, SortBy, Descending, Ascending, Limit, Page, MatchCase}
 
-func (this *PQuery) Query() *types.Query {
+func (this *PQuery) Query() *l8api.L8Query {
 	return &this.pquery
 }
 

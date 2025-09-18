@@ -3,15 +3,18 @@ package interpreter
 import (
 	"bytes"
 	"errors"
-	"github.com/saichler/gsql/go/gsql/parser"
-	"github.com/saichler/l8types/go/ifs"
-	"github.com/saichler/reflect/go/reflect/properties"
 	"reflect"
 	"strings"
+
+	"github.com/saichler/gsql/go/gsql/parser"
+	"github.com/saichler/l8types/go/ifs"
+	"github.com/saichler/l8types/go/types/l8api"
+	"github.com/saichler/l8types/go/types/l8reflect"
+	"github.com/saichler/reflect/go/reflect/properties"
 )
 
 type Query struct {
-	rootType      *types.RNode
+	rootType      *l8reflect.L8Node
 	propertiesMap map[string]ifs.IProperty
 	properties    []ifs.IProperty
 	where         *Expression
@@ -21,10 +24,10 @@ type Query struct {
 	page          int32
 	matchCase     bool
 	resources     ifs.IResources
-	query         *types.Query
+	query         *l8api.L8Query
 }
 
-func NewFromQuery(query *types.Query, resources ifs.IResources) (*Query, error) {
+func NewFromQuery(query *l8api.L8Query, resources ifs.IResources) (*Query, error) {
 	iQuery := &Query{}
 	iQuery.propertiesMap = make(map[string]ifs.IProperty)
 	iQuery.properties = make([]ifs.IProperty, 0)
@@ -68,7 +71,7 @@ func NewQuery(gsql string, resources ifs.IResources) (*Query, error) {
 	return NewFromQuery(pQuery.Query(), resources)
 }
 
-func (this *Query) Query() *types.Query {
+func (this *Query) Query() *l8api.L8Query {
 	return this.query
 }
 
@@ -96,7 +99,7 @@ func (this *Query) String() string {
 	return buff.String()
 }
 
-func (this *Query) RootType() *types.RNode {
+func (this *Query) RootType() *l8reflect.L8Node {
 	return this.rootType
 }
 
@@ -132,7 +135,7 @@ func (this *Query) SortBy() string {
 	return this.sortBy
 }
 
-func (this *Query) initTables(query *types.Query) error {
+func (this *Query) initTables(query *l8api.L8Query) error {
 	node, ok := this.resources.Introspector().Node(query.RootType)
 	if !ok {
 		return this.resources.Logger().Error("Cannot find node for table ", query.RootType)
@@ -141,7 +144,7 @@ func (this *Query) initTables(query *types.Query) error {
 	return nil
 }
 
-func (this *Query) initColumns(query *types.Query, resources ifs.IResources) error {
+func (this *Query) initColumns(query *l8api.L8Query, resources ifs.IResources) error {
 	if query.Properties != nil && len(query.Properties) == 1 && query.Properties[0] == "*" {
 		return nil
 	} else {
