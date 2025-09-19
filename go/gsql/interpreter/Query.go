@@ -6,11 +6,11 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/saichler/gsql/go/gsql/parser"
+	"github.com/saichler/l8ql/go/gsql/parser"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types/l8api"
 	"github.com/saichler/l8types/go/types/l8reflect"
-	"github.com/saichler/reflect/go/reflect/properties"
+	"github.com/saichler/l8reflect/go/reflect/properties"
 )
 
 type Query struct {

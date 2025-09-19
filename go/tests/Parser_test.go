@@ -2,7 +2,7 @@ package tests
 
 import (
 	"fmt"
-	. "github.com/saichler/gsql/go/gsql/parser"
+	. "github.com/saichler/l8ql/go/gsql/parser"
 	. "github.com/saichler/l8test/go/infra/t_resources"
 	"strconv"
 	"testing"
