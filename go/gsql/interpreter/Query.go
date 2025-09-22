@@ -16,17 +16,18 @@ import (
 )
 
 type Query struct {
-	rootType      *l8reflect.L8Node
-	propertiesMap map[string]ifs.IProperty
-	properties    []ifs.IProperty
-	where         *Expression
-	sortBy        string
-	descending    bool
-	limit         int32
-	page          int32
-	matchCase     bool
-	resources     ifs.IResources
-	query         *l8api.L8Query
+	rootType       *l8reflect.L8Node
+	propertiesMap  map[string]ifs.IProperty
+	properties     []ifs.IProperty
+	where          *Expression
+	sortBy         string
+	sortByProperty *properties.Property
+	descending     bool
+	limit          int32
+	page           int32
+	matchCase      bool
+	resources      ifs.IResources
+	query          *l8api.L8Query
 }
 
 func NewFromQuery(query *l8api.L8Query, resources ifs.IResources) (*Query, error) {
@@ -61,6 +62,14 @@ func NewFromQuery(query *l8api.L8Query, resources ifs.IResources) (*Query, error
 		return nil, err
 	}
 	iQuery.where = expr
+
+	if iQuery.sortBy != "" {
+		sortByProperty, er := properties.PropertyOf(iQuery.sortBy, resources)
+		if er != nil {
+			return nil, errors.New(er.Error())
+		}
+		iQuery.sortByProperty = sortByProperty
+	}
 
 	return iQuery, nil
 }
@@ -208,6 +217,17 @@ func (this *Query) Match(any interface{}) bool {
 		this.resources.Logger().Error(e)
 	}
 	return m
+}
+
+func (this *Query) SortByValue(v interface{}) interface{} {
+	if this.sortBy == "" {
+		return nil
+	}
+	resp, e := this.sortByProperty.Get(v)
+	if e != nil {
+		this.resources.Logger().Error(e)
+	}
+	return resp
 }
 
 func (this *Query) cloneOnlyWithColumns(any interface{}) interface{} {
