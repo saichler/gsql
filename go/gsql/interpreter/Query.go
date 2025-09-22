@@ -2,6 +2,8 @@ package interpreter
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"reflect"
 	"strings"
@@ -231,4 +233,18 @@ func (this *Query) KeyOf() string {
 
 func (this *Query) Text() string {
 	return this.query.Text
+}
+
+func (this *Query) Hash() string {
+	buff := bytes.Buffer{}
+	if this.rootType != nil {
+		buff.WriteString(this.rootType.TypeName)
+	}
+	if this.where != nil {
+		buff.WriteString(this.where.String())
+	}
+	buff.WriteString(this.sortBy)
+	h := md5.New()
+	h.Write(buff.Bytes())
+	return hex.EncodeToString(h.Sum(nil))
 }
