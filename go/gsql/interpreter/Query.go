@@ -7,10 +7,10 @@ import (
 	"strings"
 
 	"github.com/saichler/l8ql/go/gsql/parser"
+	"github.com/saichler/l8reflect/go/reflect/properties"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8types/go/types/l8api"
 	"github.com/saichler/l8types/go/types/l8reflect"
-	"github.com/saichler/l8reflect/go/reflect/properties"
 )
 
 type Query struct {
@@ -227,4 +227,8 @@ func (this *Query) KeyOf() string {
 		return ""
 	}
 	return this.where.keyOf()
+}
+
+func (this *Query) Text() string {
+	return this.query.Text
 }
