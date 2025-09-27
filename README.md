@@ -1,9 +1,9 @@
-# GSQL - Graph SQL
+# L8QL - Layer 8 API Query Language
 
 [![Go Version](https://img.shields.io/badge/go-1.23.8-blue.svg)](https://golang.org/)
 [![License](https://img.shields.io/badge/license-GPL%20v3-blue.svg)](LICENSE)
 
-GSQL (Graph SQL) is an alteration and facade of the SQL language designed for querying Graph Models at runtime. It provides a single, simple, and common API to query graph model data of any Go struct, eliminating the need for complex API integrations.
+L8QL (Layer 8 API Query Language) is an alteration and facade of the SQL language designed for querying Graph Models at runtime. It provides a single, simple, and common API to query graph model data of any Go struct, eliminating the need for complex API integrations.
 
 ## Table of Contents
 
@@ -27,7 +27,7 @@ While creating those from scratch is a nice challenge, it isn't as expensive as 
 
 If we do an analogy to Language, the infrastructure components are the alphabet, while the API is the actual Languages. Just as two persons, each knowing a different language but with the same alphabet, cannot speak to each other, two products built with the same infrastructure cannot communicate with each other and require very expensive, highly maintenance integrations.
 
-**GSQL comes to ease the language/API challenge by presenting a single, simple & common API to query the graph model & data of a product at runtime.**
+**L8QL comes to ease the language/API challenge by presenting a single, simple & common API to query the graph model & data of a product at runtime.**
 
 ## Features
 
@@ -38,12 +38,14 @@ If we do an analogy to Language, the infrastructure components are the alphabet,
 - **Sorting and Pagination**: Built-in support for `sort-by`, `limit`, `page`, `ascending`/`descending`
 - **Case Sensitivity Control**: Optional `match-case` functionality
 - **Deep Path Navigation**: Query nested objects and collections seamlessly
+- **Hash Support**: Built-in MD5 hash generation for data integrity and caching
+- **Advanced Sorting**: Sort by value with support for complex data types
 - **Type Safety**: Strong typing with Go's reflection system
 - **Zero Dependencies**: Lightweight design with minimal external dependencies
 
 ## Architecture
 
-GSQL consists of several key components:
+L8QL consists of several key components:
 
 ### 1. Introspector
 The Model Introspector accepts a Go struct and introspects it by drilling down to discover its attributes and sub-objects. From this data, it creates:
@@ -66,7 +68,7 @@ The Interpreter takes a syntax-valid parsed query and validates it via the Intro
 ## Installation
 
 ```bash
-go get github.com/saichler/gsql/go
+go get github.com/saichler/l8ql/go
 ```
 
 ## Quick Start
@@ -76,7 +78,7 @@ package main
 
 import (
     "fmt"
-    "github.com/saichler/gsql/go/gsql/interpreter"
+    "github.com/saichler/l8ql/go/gsql/interpreter"
     "github.com/saichler/l8types/go/ifs"
 )
 
@@ -163,7 +165,7 @@ select * from employee where name = 'J*'
 
 ## Query Syntax
 
-GSQL supports the following SQL-like syntax:
+L8QL supports the following SQL-like syntax:
 
 ### Basic Structure
 ```sql
@@ -247,7 +249,7 @@ go test -v -coverpkg=./gsql/... -coverprofile=cover.html ./...
 ## Project Structure
 
 ```
-gsql/
+l8ql/
 ├── go/
 │   ├── gsql/
 │   │   ├── interpreter/          # Query interpretation and execution
@@ -278,7 +280,7 @@ gsql/
 
 ## Performance Considerations
 
-- GSQL uses Go's reflection system for type introspection
+- L8QL uses Go's reflection system for type introspection
 - Query parsing is done once and can be reused
 - Filtering is performed in-memory
 - Suitable for moderate-sized datasets (thousands to tens of thousands of objects)
@@ -318,7 +320,7 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 For questions, issues, or contributions:
 
-- **Issues**: [GitHub Issues](https://github.com/saichler/gsql/issues)
+- **Issues**: [GitHub Issues](https://github.com/saichler/l8ql/issues)
 - **Discussions**: Use GitHub Discussions for questions and ideas
 - **Documentation**: Check the code documentation and tests for detailed examples
 
@@ -334,4 +336,4 @@ For questions, issues, or contributions:
 
 ---
 
-**GSQL** - Simplifying graph data querying with familiar SQL syntax.
+**L8QL** - Simplifying graph data querying with familiar SQL syntax.

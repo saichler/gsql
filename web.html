@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GSQL - Graph SQL | Query Graph Models with SQL-like Syntax</title>
-    <meta name="description" content="GSQL (Graph SQL) - A powerful SQL-like query language for Go structs and graph models. Simplify API integrations with runtime graph querying.">
+    <title>L8QL - Layer 8 API Query Language | Query Graph Models with SQL-like Syntax</title>
+    <meta name="description" content="L8QL (Layer 8 API Query Language) - A powerful SQL-like query language for Go structs and graph models. Simplify API integrations with runtime graph querying.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -15,17 +15,20 @@
         }
 
         :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --accent-color: #3b82f6;
+            --primary-color: #059669;
+            --secondary-color: #047857;
+            --accent-color: #10b981;
             --text-color: #1f2937;
             --text-light: #6b7280;
             --bg-color: #ffffff;
-            --bg-light: #f8fafc;
-            --bg-code: #1e293b;
-            --border-color: #e5e7eb;
+            --bg-light: #f0fdf4;
+            --bg-code: #1f2937;
+            --border-color: #d1fae5;
             --success-color: #10b981;
             --warning-color: #f59e0b;
+            --gradient-start: #059669;
+            --gradient-end: #0d9488;
+            --parallax-overlay: rgba(5, 150, 105, 0.1);
         }
 
         body {
@@ -81,18 +84,135 @@
             opacity: 0.8;
         }
 
-        /* Hero Section */
+        /* Parallax Scrolling */
+        .parallax-container {
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            perspective: 1px;
+        }
+
+        .parallax-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .parallax-back {
+            transform: translateZ(-2px) scale(3);
+        }
+
+        .parallax-base {
+            transform: translateZ(0);
+        }
+
+        /* Hero Section - Full Page Header */
         .hero {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
-            padding: 5rem 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.1)"/><stop offset="100%" style="stop-color:rgba(255,255,255,0.05)"/></linearGradient></defs><polygon points="0,0 1000,0 1000,800 0,1000" fill="url(%23grad)"/></svg>') no-repeat center center;
+            background-size: cover;
+            opacity: 0.1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
         }
 
         .hero h1 {
-            font-size: 3.5rem;
+            font-size: 4rem;
             margin-bottom: 1rem;
             font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Custom Illustrations */
+        .custom-illustration {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            margin: 2rem auto;
+            display: block;
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-element {
+            position: absolute;
+            opacity: 0.6;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Section headers - Full width with background */
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-light), white);
+            padding: 4rem 0;
+            margin: 0 -20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><defs><linearGradient id="wave" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:var(--primary-color);stop-opacity:0.1"/><stop offset="100%" style="stop-color:var(--accent-color);stop-opacity:0.05"/></linearGradient></defs><path d="M0,10 Q25,0 50,10 T100,10 V20 H0 Z" fill="url(%23wave)"/></svg>') repeat-x;
+            background-size: 100px 20px;
+            opacity: 0.3;
         }
 
         .hero .subtitle {
@@ -400,39 +520,79 @@
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
+
+        /* Additional section styling */
+        .features-section,
+        .architecture-section,
+        .quickstart-section,
+        .examples-section,
+        .docs-section {
+            padding: 3rem 0;
+        }
+
+        .features-section .container,
+        .architecture-section .container,
+        .quickstart-section .container,
+        .examples-section .container,
+        .docs-section .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
     </style>
 </head>
 <body>
     <header>
         <nav class="container">
-            <a href="#" class="logo">GSQL</a>
+            <a href="#" class="logo">L8QL</a>
             <ul class="nav-links">
                 <li><a href="#features">Features</a></li>
                 <li><a href="#architecture">Architecture</a></li>
                 <li><a href="#quickstart">Quick Start</a></li>
                 <li><a href="#examples">Examples</a></li>
                 <li><a href="#docs">Documentation</a></li>
-                <li><a href="https://github.com/saichler/gsql" target="_blank"><i class="fab fa-github"></i></a></li>
+                <li><a href="https://github.com/saichler/l8ql" target="_blank"><i class="fab fa-github"></i></a></li>
             </ul>
         </nav>
     </header>
 
     <section class="hero">
-        <div class="container">
-            <h1>GSQL - Graph SQL</h1>
+        <div class="floating-elements">
+            <div class="floating-element">
+                <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="30" cy="30" r="28" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                    <path d="M20 30h20M30 20v20" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+                    <circle cx="30" cy="30" r="3" fill="rgba(255,255,255,0.7)"/>
+                </svg>
+            </div>
+            <div class="floating-element">
+                <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="5" y="5" width="40" height="40" rx="8" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                    <path d="M15 25h20M15 20h10M15 30h15" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+                </svg>
+            </div>
+            <div class="floating-element">
+                <svg width="55" height="55" viewBox="0 0 55 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="27.5,5 35,20 50,20 40,32.5 45,47.5 27.5,40 10,47.5 15,32.5 5,20 20,20" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="rgba(255,255,255,0.1)"/>
+                </svg>
+            </div>
+        </div>
+        <div class="hero-content">
+            <h1>L8QL - Layer 8 API Query Language</h1>
             <p class="subtitle">Query Graph Models with familiar SQL-like syntax</p>
             <div class="badges">
                 <span class="badge"><i class="fab fa-golang"></i> Go 1.23.8</span>
                 <span class="badge"><i class="fas fa-balance-scale"></i> GPL v3</span>
                 <span class="badge"><i class="fas fa-code"></i> SQL-like</span>
                 <span class="badge"><i class="fas fa-project-diagram"></i> Graph Models</span>
+                <span class="badge"><i class="fas fa-fingerprint"></i> Hash Support</span>
             </div>
             <p>Eliminate complex API integrations with a single, simple & common API to query graph model data at runtime.</p>
             <div class="cta-buttons">
                 <a href="#quickstart" class="btn btn-primary">
                     <i class="fas fa-rocket"></i> Get Started
                 </a>
-                <a href="https://github.com/saichler/gsql" target="_blank" class="btn btn-secondary">
+                <a href="https://github.com/saichler/l8ql" target="_blank" class="btn btn-secondary">
                     <i class="fab fa-github"></i> View on GitHub
                 </a>
             </div>
@@ -446,16 +606,20 @@
             
             <div class="code-section">
                 <p>Most software engineers consider infrastructure components like Kafka, NATS, DB, ETCD as the "Wheel" and rush to implement them. However, the real challenge isn't the infrastructure—it's the <span class="highlight">API integrations and maintenance</span>.</p>
-                
+
                 <p>Using infrastructure components takes weeks or months, but building stable APIs and integrations can take <strong>years and enormous amounts of money</strong> with constant costly maintenance.</p>
-                
-                <p><strong>GSQL solves this by providing a single, universal API for querying any Go struct's graph model at runtime.</strong></p>
+
+                <p><strong>L8QL solves this by providing a single, universal API for querying any Go struct's graph model at runtime.</strong></p>
             </div>
         </section>
 
-        <section id="features">
-            <h2>Features</h2>
-            <p class="section-subtitle">Powerful capabilities for modern applications</p>
+        <section id="features" class="section-header">
+            <div class="container">
+                <h2>Features</h2>
+                <p class="section-subtitle">Powerful capabilities for modern applications</p>
+            </div>
+        </section>
+        <section class="features-section">
             
             <div class="features-grid">
                 <div class="feature-card">
@@ -493,12 +657,28 @@
                     <h3>Type Safety</h3>
                     <p>Strong typing with Go's type system ensures compile-time safety and runtime reliability.</p>
                 </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-fingerprint"></i></div>
+                    <h3>Hash Support</h3>
+                    <p>Built-in MD5 hash generation for data integrity, caching, and efficient data comparison.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-sort-amount-down"></i></div>
+                    <h3>Advanced Sorting</h3>
+                    <p>Sort by value with support for complex data types and custom sorting algorithms.</p>
+                </div>
             </div>
         </section>
 
-        <section id="architecture">
-            <h2>Architecture</h2>
-            <p class="section-subtitle">Four core components working together</p>
+        <section id="architecture" class="section-header">
+            <div class="container">
+                <h2>Architecture</h2>
+                <p class="section-subtitle">Four core components working together</p>
+            </div>
+        </section>
+        <section class="architecture-section">
             
             <div class="architecture-grid">
                 <div class="architecture-item">
@@ -523,20 +703,24 @@
             </div>
         </section>
 
-        <section id="quickstart">
-            <h2>Quick Start</h2>
-            <p class="section-subtitle">Get up and running in minutes</p>
+        <section id="quickstart" class="section-header">
+            <div class="container">
+                <h2>Quick Start</h2>
+                <p class="section-subtitle">Get up and running in minutes</p>
+            </div>
+        </section>
+        <section class="quickstart-section">
             
             <div class="code-section">
                 <h3><i class="fas fa-download"></i> Installation</h3>
-                <div class="install-code">go get github.com/saichler/gsql/go</div>
+                <div class="install-code">go get github.com/saichler/l8ql/go</div>
                 
                 <h3><i class="fas fa-play"></i> Basic Usage</h3>
                 <pre><code class="language-go">package main
 
 import (
     "fmt"
-    "github.com/saichler/gsql/go/gsql/interpreter"
+    "github.com/saichler/l8ql/go/gsql/interpreter"
 )
 
 // Define your model
@@ -580,9 +764,13 @@ func main() {
             </div>
         </section>
 
-        <section id="examples">
-            <h2>Query Examples</h2>
-            <p class="section-subtitle">See GSQL in action</p>
+        <section id="examples" class="section-header">
+            <div class="container">
+                <h2>Query Examples</h2>
+                <p class="section-subtitle">See L8QL in action</p>
+            </div>
+        </section>
+        <section class="examples-section">
             
             <div class="query-examples">
                 <div class="query-example">
@@ -685,9 +873,13 @@ criteria := query.Criteria()</code></pre>
             </div>
         </section>
 
-        <section id="docs">
-            <h2>Documentation</h2>
-            <p class="section-subtitle">Everything you need to know</p>
+        <section id="docs" class="section-header">
+            <div class="container">
+                <h2>Documentation</h2>
+                <p class="section-subtitle">Everything you need to know</p>
+            </div>
+        </section>
+        <section class="docs-section">
             
             <div class="features-grid">
                 <div class="feature-card">
@@ -718,7 +910,7 @@ criteria := query.Criteria()</code></pre>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>GSQL</h4>
+                    <h4>L8QL</h4>
                     <p>Simplifying graph data querying with familiar SQL syntax.</p>
                 </div>
                 
@@ -735,10 +927,10 @@ criteria := query.Criteria()</code></pre>
                 <div class="footer-section">
                     <h4>Community</h4>
                     <ul class="footer-links">
-                        <li><a href="https://github.com/saichler/gsql" target="_blank">GitHub</a></li>
-                        <li><a href="https://github.com/saichler/gsql/issues" target="_blank">Issues</a></li>
-                        <li><a href="https://github.com/saichler/gsql/discussions" target="_blank">Discussions</a></li>
-                        <li><a href="https://github.com/saichler/gsql/releases" target="_blank">Releases</a></li>
+                        <li><a href="https://github.com/saichler/l8ql" target="_blank">GitHub</a></li>
+                        <li><a href="https://github.com/saichler/l8ql/issues" target="_blank">Issues</a></li>
+                        <li><a href="https://github.com/saichler/l8ql/discussions" target="_blank">Discussions</a></li>
+                        <li><a href="https://github.com/saichler/l8ql/releases" target="_blank">Releases</a></li>
                     </ul>
                 </div>
                 
@@ -750,7 +942,7 @@ criteria := query.Criteria()</code></pre>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2024 GSQL Project. All rights reserved.</p>
+                <p>&copy; 2024 L8QL Project. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -804,11 +996,70 @@ criteria := query.Criteria()</code></pre>
             });
         });
 
+        // Parallax scrolling effects
+        function initParallax() {
+            const parallaxElements = document.querySelectorAll('.floating-element');
+            const hero = document.querySelector('.hero');
+
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const rate = scrolled * -0.5;
+
+                // Move floating elements at different speeds
+                parallaxElements.forEach((element, index) => {
+                    const speed = 0.2 + (index * 0.1);
+                    const yPos = -(scrolled * speed);
+                    element.style.transform = `translateY(${yPos}px) rotate(${scrolled * 0.1}deg)`;
+                });
+
+                // Hero parallax effect
+                if (hero && scrolled < window.innerHeight) {
+                    hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+                    hero.style.opacity = 1 - (scrolled / window.innerHeight);
+                }
+            });
+        }
+
+        // Section reveal animations
+        function initScrollAnimations() {
+            const sections = document.querySelectorAll('.section-header, .feature-card, .architecture-item');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(50px)';
+                section.style.transition = 'all 0.8s ease-out';
+                observer.observe(section);
+            });
+        }
+
         // Mobile menu toggle (for future enhancement)
         function toggleMobileMenu() {
             const navLinks = document.querySelector('.nav-links');
             navLinks.classList.toggle('mobile-open');
         }
+
+        // Initialize all effects
+        window.addEventListener('load', function() {
+            const codeBlocks = document.querySelectorAll('pre code');
+            codeBlocks.forEach(block => {
+                block.classList.add('loading');
+                setTimeout(() => {
+                    block.classList.remove('loading');
+                }, 1000);
+            });
+
+            initParallax();
+            initScrollAnimations();
+        });
     </script>
 </body>
 </html>
